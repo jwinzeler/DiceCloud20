@@ -1,0 +1,93 @@
+.dc20-refresh {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+.dc20 button {
+    border: 0;
+    border-left: 1px solid rgba(0,0,0,.12);
+    border-bottom: 1px solid rgba(0,0,0,.12);
+    background: white;
+}
+
+.dc20 button:focus {
+    outline: none;
+}
+
+.dc20 button:hover {
+    background: rgb(224,224,224);
+}
+
+.dc20 button:last-child {
+    border-bottom: none;
+}
+
+.dc20 button.dc20-advantage {
+    color: rgb(0,170,0);
+}
+
+.dc20 button.dc20-advantage:hover {
+    background: rgba(0,170,0,.12);
+}
+
+.dc20 button.dc20-disadvantage {
+    color: rgb(170,0,0);
+}
+
+.dc20 button.dc20-disadvantage:hover {
+    background: rgba(170,0,0,.12);
+}
+
+.dc20-ability,
+.dc20-stat {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.dc20-ability button,
+.dc20-stat button {
+    height: 25%;
+}
+
+.dc20-stat button:only-child {
+    height: 100%;
+}
+
+.dc20-skill {
+    position: absolute;
+    right: 5px;
+}
+
+.dc20-skill button {
+    border: 1px solid rgba(0,0,0,.12);
+    border-right: 0;
+}
+
+.dc20-skill button:last-child {
+    border-bottom: 1px solid rgba(0,0,0,.12);
+    border-right: 1px solid rgba(0,0,0,.12);
+}
+
+.dc20-attack {
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+.dc20-attack button:first-child {
+    border-top: 1px solid rgba(0,0,0,.12);
+}
+
+.dc20-attack button:last-child {
+    border-bottom: 1px solid rgba(0,0,0,.12);
+}
+
+.dc20-feature button {
+    border: 0;
+}

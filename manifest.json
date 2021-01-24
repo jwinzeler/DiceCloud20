@@ -1,0 +1,21 @@
+{
+    "name": "DiceCloud20",
+    "version": "0.1",
+    "description": "Simple integration between DiceCloud character sheets and the roll20 chat",
+    "manifest_version": 2,
+    "background": {
+        "scripts": ["Background/main.js"]
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://*.dicecloud.com/*"],
+            "css": ["DiceCloud/style.css"],
+            "js": ["DiceCloud/main.js"]
+        },
+        {
+            "matches": ["https://app.roll20.net/*"],
+            "css": ["Roll20/style.css"],
+            "js": ["Roll20/main.js"]
+        }
+    ]
+}
