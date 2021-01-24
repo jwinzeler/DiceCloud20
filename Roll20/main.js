@@ -5,7 +5,6 @@ function getChatElements() {
 }
 
 function sendChatMessage(message) {
-    console.log(message);
     if (!chatElements) {
         chatElements = getChatElements();
     }

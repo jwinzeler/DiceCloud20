@@ -168,7 +168,7 @@ function getElementTypeInfo(elementType, element) {
                 value: element.parentElement.querySelector('.bottom'),
             };
             if (info.value) {
-                info.value = info.value.innerHTML.trim();
+                info.value = info.value.innerHTML.formatText();
             }
             if (info.uses) {
                 info.uses = info.uses.innerHTML.cleanWhiteSpace();
@@ -176,14 +176,19 @@ function getElementTypeInfo(elementType, element) {
                 info.max = uses[2];
                 info.uses = uses[1]
             }
-            console.log(info);
             return info;
     }
 }
 
+String.prototype.formatText = function() {
+    let string = this.trim();
+    string = string.replace(/<\/?strong>/g, '**').replace(/<p>/g, '\n').replace(/<\/p>/g, '');
+    return string;
+}
+
 String.prototype.cleanWhiteSpace = function() {
     let string = this.trim();
-    string = string.replace(/\s/, '');
+    string = string.replace(/\s{2,}/g, '').replace(/\*/g, '');
     return string;
 }
 
