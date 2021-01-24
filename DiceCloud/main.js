@@ -56,7 +56,7 @@ function getButtonConfig(info) {
         [ElementType.SKILL]: {
             classes: ['dc20-skill'],
             [Button.POST]: {
-                message: `&{template:5e-shaped} {{title=${info.title}: ${info.value}}}`,
+                message: `&{template:5e-shaped} {{title=${info.title}${info.isSavingThrow ? ' Saving Throw' : ''}: ${info.value}}}`,
                 create: true,
             },
             [Button.ADVANTAGE]: {
@@ -256,6 +256,9 @@ function ready() {
     document.body.append(refresh);
     
     updateElements();
+    setInterval(() => {
+        updateElements();
+    }, 60 * 1000);
 }
 
 chrome.runtime.sendMessage("init");
