@@ -80,15 +80,15 @@ function getButtonConfig(info) {
             },
             [Button.ADVANTAGE]: {
                 message: `&{template:5e-shaped} {{title=${info.title}}} {{attack1=[[2d20kh1${info.value}]]}} {{2d20kh1=1}} {{attack_damage=[[${info.dice}]]}} {{attack_damage_crit=[[${info.crit}]]}} {{attack_damage_type=${info.type}}} {{has_attack_damage=1}}`,
-                create: !info.requiresSavingThrow,
+                create: !info.requiresSavingThrow && !info.isHeal,
             },
             [Button.NORMAL]: {
-                message: `&{template:5e-shaped} {{title=${info.title}}} ${info.requiresSavingThrow ? `{{saving_throw_dc=${info.value}}} {{saving_throw_vs_ability=${info.extra.toUpperCase()}}}` : `{{attack1=[[1d20${info.value}]]}} {{attack_damage_crit=[[${info.crit}]]}}`}{{attack_damage=[[${info.dice}]]}} {{attack_damage_type=${info.type}}} {{has_attack_damage=1}}`,
+                message: `&{template:5e-shaped} {{title=${info.title}}} ${info.requiresSavingThrow ? `{{saving_throw_dc=${info.value}}} {{saving_throw_vs_ability=${info.extra.toUpperCase()}}}` : info.isHeal ? `{{heal=[[${info.dice}]]}}` : `{{attack1=[[1d20${info.value}]]}} {{attack_damage_crit=[[${info.crit}]]}}`} ${info.isHeal ? '' : `{{attack_damage=[[${info.dice}]]}} {{attack_damage_type=${info.type}}} {{has_attack_damage=1}}`}`,
                 create: true,
             },
             [Button.DISADVANTAGE]: {
                 message: `&{template:5e-shaped} {{title=${info.title}}} {{attack1=[[2d20kl1${info.value}]]}} {{2d20kl1=1}} {{attack_damage=[[${info.dice}]]}} {{attack_damage_crit=[[${info.crit}]]}} {{attack_damage_type=${info.type}}} {{has_attack_damage=1}}`,
-                create: !info.requiresSavingThrow,
+                create: !info.requiresSavingThrow && !info.isHeal,
             },
         },
         [ElementType.FEATURE]: {
@@ -156,6 +156,7 @@ function getElementTypeInfo(elementType, element) {
                 info.extra = '';
             }
             info.requiresSavingThrow = info.extra.includes('Saving Throw');
+            info.isHeal = info.extra.includes('Heal');
             if (info.requiresSavingThrow) {
                 info.extra = info.extra.replace(' Saving Throw', '');
                 info.value = info.value.replace('+', '');
