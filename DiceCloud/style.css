@@ -95,3 +95,28 @@
 .dc20-feature button {
     border: 0;
 }
+
+.features .column-container>div:first-child {
+    column-span: all;
+}
+
+.features .column-container>div:first-child .bottom.list {
+    column-width: 296px;
+    column-gap: 8px;
+    column-fill: balance;
+    column-rule: 1px solid rgba(0,0,0,.12);
+    padding: 0;
+}
+
+.features .column-container>div:first-child .bottom.list .item-slot {
+    display: inline-flex;
+    min-width: 100%;
+    align-items: center;
+    background-color: transparent;
+    height: 96px;
+}
+
+.features .column-container>div:first-child .bottom.list .item-slot .attack {
+    width: 100%;
+    background: transparent;
+}

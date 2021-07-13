@@ -22,15 +22,15 @@ function getButtonConfig(info) {
                 create: true,
             },
             [Button.ADVANTAGE]: {
-                message: `&{template:5e-shaped} {{title=${info.title} Check:}} {{roll1=[[2d20kh1${info.modifier}]]}} {{2d20kh1=1}}`,
+                message: `&{template:5e-shaped} {{title=${info.title}}} {{roll1=[[2d20kh1${info.modifier}]]}} {{2d20kh1=1}}`,
                 create: true,
             },
             [Button.NORMAL]: {
-                message: `&{template:5e-shaped} {{title=${info.title} Check:}} {{roll1=[[1d20${info.modifier}]]}}`,
+                message: `&{template:5e-shaped} {{title=${info.title}}} {{roll1=[[1d20${info.modifier}]]}}`,
                 create: true,
             },
             [Button.DISADVANTAGE]: {
-                message: `&{template:5e-shaped} {{title=${info.title} Check:}} {{roll1=[[2d20kl1${info.modifier}]]}} {{2d20kl1=1}}`,
+                message: `&{template:5e-shaped} {{title=${info.title}}} {{roll1=[[2d20kl1${info.modifier}]]}} {{2d20kl1=1}}`,
                 create: true,
             },
         },
@@ -41,15 +41,15 @@ function getButtonConfig(info) {
                 create: true,
             },
             [Button.ADVANTAGE]: {
-                message: `&{template:5e-shaped} {{title=${info.title} Check:}} {{roll1=[[2d20kh1${info.value}&{tracker}]]}} {{2d20kh1=1}}`,
+                message: `&{template:5e-shaped} {{title=${info.title}}} {{roll1=[[2d20kh1${info.value}&{tracker}]]}} {{2d20kh1=1}}`,
                 create: info.isInitiative,
             },
             [Button.NORMAL]: {
-                message: `&{template:5e-shaped} {{title=${info.title} Check:}} {{roll1=[[1d20${info.value}&{tracker}]]}}`,
+                message: `&{template:5e-shaped} {{title=${info.title}}} {{roll1=[[1d20${info.value}&{tracker}]]}}`,
                 create: info.isInitiative,
             },
             [Button.DISADVANTAGE]: {
-                message: `&{template:5e-shaped} {{title=${info.title} Check:}} {{roll1=[[2d20kl1${info.value}&{tracker}]]}} {{2d20kl1=1}}`,
+                message: `&{template:5e-shaped} {{title=${info.title}}} {{roll1=[[2d20kl1${info.value}&{tracker}]]}} {{2d20kl1=1}}`,
                 create: info.isInitiative,
             },
         },
