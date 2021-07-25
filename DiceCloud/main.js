@@ -259,7 +259,11 @@ function ready() {
     updateElements();
     setInterval(() => {
         updateElements();
-    }, 60 * 1000);
+    }, 15 * 1000);
+}
+
+function noRoll20() {
+    alert("Roll20 has not been recognized by the extension. Please make sure it is open and refresh it.");
 }
 
 chrome.runtime.sendMessage("init");
@@ -268,6 +272,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     switch(request) {
         case "ready":
             ready();
+            break;
+        case "noRoll20":
+            noRoll20();
             break;
     }
 });

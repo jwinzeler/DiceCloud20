@@ -1,0 +1,58 @@
+.dc20-menu {
+    position: fixed;
+    right: 2px;
+    bottom: 5px;
+}
+
+.dc20-advantage .dc20 button:not(.dc20-noadvantage),
+.dc20-advantage button.dc20-advantage {
+    background: #648f64;
+    color: white;
+}
+
+.dc20-disadvantage .dc20 button:not(.dc20-noadvantage),
+.dc20-disadvantage button.dc20-disadvantage {
+    background: #9c6565;
+    color: white;
+}
+
+.dc20 button {
+    outline: 0;
+    border: 0;
+    border-radius: 3px;
+    margin-right: 3px;
+    background: rgb(239, 239, 239);
+}
+
+.dc20 button:hover {
+    background: rgb(210, 210, 210);
+}
+
+.dc20-advantage .dc20 button:hover:not(.dc20-noadvantage),
+.dc20-advantage button:hover.dc20-advantage {
+    background: #537553;
+}
+
+.dc20-disadvantage .dc20 button:hover:not(.dc20-noadvantage),
+.dc20-disadvantage button:hover.dc20-disadvantage {
+    background: #835555;
+}
+
+.dc20-hidden {
+    display: none;
+}
+
+.dc20-ability {
+    display: inline-grid;
+    grid-template-columns: repeat(6, 1fr);
+}
+
+.monster .monster-abilities {
+    display: flex !important;
+    width: 100% !important;
+    justify-content: space-around !important;
+}
+
+.dc20-action button {
+    text-align: left;
+}
