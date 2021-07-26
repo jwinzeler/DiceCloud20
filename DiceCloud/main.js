@@ -18,57 +18,102 @@ function getButtonConfig(info) {
         [ElementType.ABILITY]: {
             classes: ['dc20-ability'],
             [Button.POST]: {
-                message: `&{template:5e-shaped} {{title=${info.title}: ${info.value} (${info.modifier})}}`,
+                templateStats: {
+                    title: info.title,
+                    subheader: `${info.value} (${info.modifier})`,
+                },
                 create: true,
             },
             [Button.ADVANTAGE]: {
-                message: `&{template:5e-shaped} {{title=${info.title}}} {{roll1=[[2d20kh1${info.modifier}]]}} {{2d20kh1=1}}`,
+                templateStats: {
+                    advantage: advantageStates.ADVANTAGE,
+                    title: info.title,
+                    mainModifier: info.modifier,
+                },
                 create: true,
             },
             [Button.NORMAL]: {
-                message: `&{template:5e-shaped} {{title=${info.title}}} {{roll1=[[1d20${info.modifier}]]}}`,
+                templateStats: {
+                    title: info.title,
+                    mainModifier: info.modifier,
+                },
                 create: true,
             },
             [Button.DISADVANTAGE]: {
-                message: `&{template:5e-shaped} {{title=${info.title}}} {{roll1=[[2d20kl1${info.modifier}]]}} {{2d20kl1=1}}`,
+                templateStats: {
+                    advantage: advantageStates.DISADVANTAGE,
+                    title: info.title,
+                    mainModifier: info.modifier,
+                },
                 create: true,
             },
         },
         [ElementType.STAT]: {
             classes: ['dc20-stat'],
             [Button.POST]: {
-                message: `&{template:5e-shaped} {{title=${info.title}: ${info.value}}}`,
+                templateStats: {
+                    title: info.title,
+                    subheader: info.value,
+                },
                 create: true,
             },
             [Button.ADVANTAGE]: {
-                message: `&{template:5e-shaped} {{title=${info.title}}} {{roll1=[[2d20kh1${info.value}&{tracker}]]}} {{2d20kh1=1}}`,
+                templateStats: {
+                    advantage: advantageStates.ADVANTAGE,
+                    isInitiative: info.isInitiative,
+                    title: info.title,
+                    mainModifier: info.value,
+                },
                 create: info.isInitiative,
             },
             [Button.NORMAL]: {
-                message: `&{template:5e-shaped} {{title=${info.title}}} {{roll1=[[1d20${info.value}&{tracker}]]}}`,
+                templateStats: {
+                    isInitiative: info.isInitiative,
+                    title: info.title,
+                    mainModifier: info.value,
+                },
                 create: info.isInitiative,
             },
             [Button.DISADVANTAGE]: {
-                message: `&{template:5e-shaped} {{title=${info.title}}} {{roll1=[[2d20kl1${info.value}&{tracker}]]}} {{2d20kl1=1}}`,
+                templateStats: {
+                    advantage: advantageStates.DISADVANTAGE,
+                    isInitiative: info.isInitiative,
+                    title: info.title,
+                    mainModifier: info.value,
+                },
                 create: info.isInitiative,
             },
         },
         [ElementType.SKILL]: {
             classes: ['dc20-skill'],
             [Button.POST]: {
-                message: `&{template:5e-shaped} {{title=${info.title}${info.isSavingThrow ? ' Saving Throw' : ''}: ${info.value}}}`,
+                templateStats: {
+                    title: `${info.title}${info.isSavingThrow ? ' Saving Throw' : ''}`,
+                    subheader: info.value,
+                },
                 create: true,
             },
             [Button.ADVANTAGE]: {
-                message: `&{template:5e-shaped} {{title=${info.title} ${info.isSavingThrow ? 'Saving Throw' : 'Check'}:}} {{roll1=[[2d20kh1${info.value}]]}} {{2d20kh1=1}}`,
+                templateStats: {
+                    advantage: advantageStates.ADVANTAGE,
+                    title: `${info.title}${info.isSavingThrow ? ' Saving Throw' : ''}`,
+                    mainModifier: info.value,
+                },
                 create: true,
             },
             [Button.NORMAL]: {
-                message: `&{template:5e-shaped} {{title=${info.title} ${info.isSavingThrow ? 'Saving Throw' : 'Check'}:}} {{roll1=[[1d20${info.value}]]}}`,
+                templateStats: {
+                    title: `${info.title}${info.isSavingThrow ? ' Saving Throw' : ''}`,
+                    mainModifier: info.value,
+                },
                 create: true,
             },
             [Button.DISADVANTAGE]: {
-                message: `&{template:5e-shaped} {{title=${info.title} ${info.isSavingThrow ? 'Saving Throw' : 'Check'}:}} {{roll1=[[2d20kl1${info.value}]]}} {{2d20kl1=1}}`,
+                templateStats: {
+                    advantage: advantageStates.DISADVANTAGE,
+                    title: `${info.title}${info.isSavingThrow ? ' Saving Throw' : ''}`,
+                    mainModifier: info.value,
+                },
                 create: true,
             },
         },
@@ -79,22 +124,55 @@ function getButtonConfig(info) {
                 create: false,
             },
             [Button.ADVANTAGE]: {
-                message: `&{template:5e-shaped} {{title=${info.title}}} {{attack1=[[2d20kh1${info.value}]]}} {{2d20kh1=1}} {{attack_damage=[[${info.dice}]]}} {{attack_damage_crit=[[${info.crit}]]}} {{attack_damage_type=${info.type}}} {{has_attack_damage=1}}`,
+                templateStats: {
+                    advantage: advantageStates.ADVANTAGE,
+                    title: info.title,
+                    mainModifier: info.value,
+                    attackDice: info.dice,
+                    attackModifier: info.modifier,
+                    attackType: info.type
+                },
                 create: !info.requiresSavingThrow && !info.isHeal,
             },
             [Button.NORMAL]: {
-                message: `&{template:5e-shaped} {{title=${info.title}}} ${info.requiresSavingThrow ? `{{saving_throw_dc=${info.value}}} {{saving_throw_vs_ability=${info.extra.toUpperCase()}}}` : info.isHeal ? `{{heal=[[${info.dice}]]}}` : `{{attack1=[[1d20${info.value}]]}} {{attack_damage_crit=[[${info.crit}]]}}`} ${info.isHeal ? '' : `{{attack_damage=[[${info.dice}]]}} {{attack_damage_type=${info.type}}} {{has_attack_damage=1}}`}`,
+                templateStats: {
+                    title: info.title,
+                    mainModifier: !info.requiresSavingThrow && !info.isHeal ? info.value : null,
+                    attackDice: !info.requiresSavingThrow && !info.isHeal ? info.dice : null,
+                    attackModifier: !info.requiresSavingThrow && !info.isHeal ? info.modifier : null,
+                    attackType: !info.requiresSavingThrow && !info.isHeal ? info.type : null,
+                    saveDC: info.requiresSavingThrow ? info.value : null,
+                    saveAbility: info.requiresSavingThrow ? info.extra.toUpperCase() : null,
+                    saveFailure: info.requiresSavingThrow ? true : null,
+                    saveFailureDice: info.requiresSavingThrow ? info.dice : null,
+                    saveFailureModifier: info.requiresSavingThrow ? info.modifier : null,
+                    saveFailureDamageType: info.requiresSavingThrow ? info.type : null,
+                    healDice: info.isHeal ? info.dice : null,
+                    healModifier: info.isHeal ? info.modifier : null,
+                },
                 create: true,
             },
             [Button.DISADVANTAGE]: {
-                message: `&{template:5e-shaped} {{title=${info.title}}} {{attack1=[[2d20kl1${info.value}]]}} {{2d20kl1=1}} {{attack_damage=[[${info.dice}]]}} {{attack_damage_crit=[[${info.crit}]]}} {{attack_damage_type=${info.type}}} {{has_attack_damage=1}}`,
+                templateStats: {
+                    advantage: advantageStates.DISADVANTAGE,
+                    title: info.title,
+                    mainModifier: info.value,
+                    attackDice: info.dice,
+                    attackModifier: info.modifier,
+                    attackType: info.type
+                },
                 create: !info.requiresSavingThrow && !info.isHeal,
             },
         },
         [ElementType.FEATURE]: {
             classes: ['dc20-feature'],
             [Button.POST]: {
-                message: `&{template:5e-shaped} {{title=${info.title}}} ${info.uses ? `{{uses=${info.uses}}} {{uses_max=${info.max}}}` : ''} ${info.value ? `{{content=${info.value}}}` : ''}`,
+                templateStats: {
+                    title: info.title,
+                    subheader: info.value ? info.value : null,
+                    uses: info.uses && info.max ? info.uses : null,
+                    maxUses: info.uses && info.max ? info.max : null,
+                },
                 create: true,
             },
             [Button.ADVANTAGE]: {
@@ -146,8 +224,8 @@ function getElementTypeInfo(elementType, element) {
                 value: element.querySelector('.paper-font-headline').innerHTML.cleanWhiteSpace(),
             };
             info.type = info.dice.match(/(&nbsp;[a-z]+)$/)[0].replace('&nbsp;', '').upperCaseFirst();
-            info.dice = info.dice.replace(/(&nbsp;[a-z]+)$/, '').replace(' ', '');
-            info.crit = info.dice.replace(/\+[0-9]+$/, '');
+            info.modifier = info.dice.replace(/(&nbsp;[a-z]+)$/, '').replace(' ', '').replace(/[0-9]+d[0-9]+/, '');
+            info.dice = info.dice.replace(/(&nbsp;[a-z]+)$/, '').replace(' ', '').replace(/\+[0-9]+$/, '');
 
             let extra = element.querySelector('.flex.layout.vertical div:nth-child(3)');
             if (extra) {
@@ -197,17 +275,22 @@ String.prototype.upperCaseFirst = function() {
     return this.charAt(0).toUpperCase() + this.slice(1)
 }
 
-function getButton(message, cclass, label) {
+function sendRoll(templateStats) {
+    const message = TemplateStringBuilder.getTemplate(templateStats);
+    chrome.runtime.sendMessage(message);
+}
+
+function getButton(templateStats, cclass, label) {
     let element = document.createElement('button');
     element.innerHTML = label;
     element.classList.add(cclass);
-    element.onclick = function() {chrome.runtime.sendMessage(message)};
+    element.onclick = function() { sendRoll(templateStats) };
     return element;
 }
 
 function addButton(element, config, cclass, label) {
     if (config.create) {
-        element.append(getButton(config.message, cclass, label));
+        element.append(getButton(config.templateStats, cclass, label));
     }
 }
 

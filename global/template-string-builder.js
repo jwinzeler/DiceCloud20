@@ -5,6 +5,8 @@ class TemplateStringBuilder {
 
         template += TemplateStringBuilder.getTitle(stats);
         template += TemplateStringBuilder.getSubheader(stats);
+        
+        template += TemplateStringBuilder.getUses(stats);
 
         template += TemplateStringBuilder.getMainRoll(stats);
         template += TemplateStringBuilder.getHasAttack(stats);
@@ -32,7 +34,7 @@ class TemplateStringBuilder {
     }
 
     static getGMRoll(stats) {
-        if (stats.gmroll) {
+        if (stats.isGmroll) {
             return '/w gm ';
         }
 
@@ -59,13 +61,22 @@ class TemplateStringBuilder {
         return '';
     }
 
+    static getUses(stats) {
+        if (stats.uses && stats.maxUses) {
+            return `{{uses=${stats.uses}}}{{uses_max=${stats.maxUses}}}`;
+        }
+
+        return '';
+    }
+
     static getMainRoll(stats) {
         let advantage = TemplateStringBuilder.getAdvantageInfo(stats);
+        let initiative = TemplateStringBuilder.getInitiativeInfo(stats);
 
         if (stats.mainModifier && (stats.attackDice || stats.attackModifier)) {
-            return `{{attack1=[[${advantage.roll}${stats.mainModifier}]]}}${advantage.string}`;
+            return `{{attack1=[[${advantage.roll}${stats.mainModifier}${initiative}]]}}${advantage.string}`;
         } else if (stats.mainModifier) {
-            return `{{roll1=[[${advantage.roll}${stats.mainModifier}]]}}${advantage.string}`;
+            return `{{roll1=[[${advantage.roll}${stats.mainModifier}${initiative}]]}}${advantage.string}`;
         }
 
         return '';
@@ -79,6 +90,14 @@ class TemplateStringBuilder {
         }
 
         return {roll: '1d20', string: ''};
+    }
+
+    static getInitiativeInfo(stats) {
+        if (stats.isInitiative) {
+            return '&{tracker}';
+        }
+        
+        return '';
     }
 
     static getHasAttack(stats) {

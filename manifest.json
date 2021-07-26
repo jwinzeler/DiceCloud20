@@ -1,11 +1,10 @@
 {
     "name": "DiceCloud20",
-    "version": "1.0",
+    "version": "1.1",
     "description": "Simple integration between DiceCloud character sheets and the roll20 chat",
     "manifest_version": 2,
     "background": {
         "scripts": [
-            "global/template-stats.js",
             "global/advantage-states.js",
             "background/messager.js",
             "background/main.js"
@@ -15,7 +14,11 @@
         {
             "matches": ["https://*.dicecloud.com/*"],
             "css": ["dicecloud/style.css"],
-            "js": ["dicecloud/main.js"]
+            "js": [
+                "global/template-string-builder.js",
+                "global/advantage-states.js",
+                "dicecloud/main.js"
+            ]
         },
         {
             "matches": ["https://app.roll20.net/*"],
@@ -27,7 +30,6 @@
             "css": ["monstermaker/style.css"],
             "js": [
                 "global/template-string-builder.js",
-                "global/template-stats.js",
                 "global/advantage-states.js",
                 "monstermaker/main.js"
             ]

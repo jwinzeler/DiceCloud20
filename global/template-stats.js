@@ -1,9 +1,13 @@
 class TemplateStats {
     advantage; // advantageStates
-    gmroll; // boolean
+    isGmroll; // boolean
+    isInitiative; // boolean
 
     title; // string any
     subheader; // string any
+    
+    uses; // number
+    maxUses; // number
 
     mainModifier; // string \+[0-9]+
 
