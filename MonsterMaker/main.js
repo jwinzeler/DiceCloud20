@@ -41,7 +41,7 @@ const ElementType = {
     }
 }
 
-function sendRoll(title, description, type, attackMod = null, attackDice = null, attackDamage = null, attackDamageType = null, saveDC = null, saveAbility = null, saveSuccess = null, saveFailure = null, saveFailureDice = null, saveFailureDamage = null, saveFailureDamageType = null, healDice = null, healDamage = null) {
+function sendRoll(title, description, type, attackMod = null, attackDice = null, attackDamage = null, attackDamageType = null, saveDC = null, saveAbility = null, saveSuccess = null, saveFailure = null, saveFailureDice = null, saveFailureDamage = null, saveFailureDamageType = null, healDice = null, healDamage = null, attack2Dice = null, attack2Damage = null, attack2DamageType = null, saveFailure2Dice = null, saveFailure2Damage = null, saveFailure2DamageType = null) {
     let diceRoll = '1d20';
     let advantage = '';
     if (rollState == states.ADVANTAGE) {
@@ -81,6 +81,17 @@ function sendRoll(title, description, type, attackMod = null, attackDice = null,
                 attack += `{{attack_damage_type=${attackDamageType}}} `;
             }
 
+            if (attack2Dice) {
+                if (attack2Damage) {
+                    attack += `{{attack_second_damage=[[${attack2Dice}${attack2Damage}]]}} {{attack_second_damage_crit=[[${attack2Dice}]]}} `;
+                } else {
+                    attack += `{{attack_second_damage=[[${attack2Dice}]]}} {{attack_second_damage_crit=[[${attack2Dice}]]}} `;
+                }
+            }
+            if (attack2DamageType) {
+                attack += `{{attack_second_damage_type=${attack2DamageType}}} `;
+            }
+
             let save = '';
             if (saveDC) {
                 save += `{{saving_throw_dc=${saveDC}}} `;
@@ -98,6 +109,17 @@ function sendRoll(title, description, type, attackMod = null, attackDice = null,
                     }
                     if (saveFailureDamageType) {
                         save += `{{saving_throw_damage_type=${saveFailureDamageType}}} `;
+                    }
+                }
+
+                if (saveFailure2Dice) {
+                    if (saveFailure2Damage) {
+                        save += `{{saving_throw_second_damage=[[${saveFailure2Dice}${saveFailure2Damage}]]}} `;
+                    } else {
+                        save += `{{saving_throw_second_damage=[[${saveFailure2Dice}]]}} `;
+                    }
+                    if (saveFailure2DamageType) {
+                        save += `{{saving_throw_second_damage_type=${saveFailure2DamageType}}} `;
                     }
                 }
             }
@@ -194,35 +216,43 @@ function createButtons(elementType, key, element) {
 
         /**
          * Action Templates:
-         * Attack: +9 to hit.
-         * Attack damage: Hit 33 (1d10) slashing damage.
-         * Attack damage: Hit 33 (1d10 + 5) slashing damage.
-         * Saving Throw: DC 17 Strength saving throw.
-         * On Failure: Failure: 33 (6d10) fire damage.
-         * On Failure: Failure: 33 (6d10 + 5) fire damage.
-         * On Success: Success: Half Damage.
-         * On Success: Success: I can't do rolls :(.
-         * Heals: Regain 33 (3d20 + 2) hitpoints
-         * Heals: Regain 33 (3d20) hitpoints
+         * Attack: ```+9 to hit```
+         * Attack damage: ```Hit: 33 (1d10 + 5) slashing damage```
+         * Second damage: ```Hit: 33 (1d10 + 5) slashing damage and  33 (1d10 + 5) piercing damage```
+         * Saving Throw: ```DC 17 Strength saving throw```
+         * On Failure: ```Failure: 33 (6d10) fire damage```
+         * Second Failure: ```Failure: 33 (1d10 + 5) fire damage and  33 (1d10 + 5) thunder damage```
+         * On Success: ```Success: Any text goes here, no rolls though```
+         * Heals: ```Regain 33 (3d20 + 2) hitpoints```
+         * 
+         * Format for rolls can be either ```33 (1d10 + 5)``` or ```33 (1d10)```
          */
 
-        const attackModRegexp = /([+-−][0-9]+) to hit./;
-        const attackDiceRegexp = /[hH]it: [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) [a-zA-Z]+ damage./;
-        const attackDamageRegexp = /[hH]it: [0-9]+ \([0-9]+d[0-9]+ (\+ [0-9]+)\) [a-zA-Z]+ damage./; // Replace whitespace with nothing!
-        const attackDamageTypeRegexp = /[hH]it: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) ([a-zA-Z]+) damage./;
+        const attackModRegexp = /([+-−][0-9]+) to hit/;
+        const attackDiceRegexp = /[hH]it: [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) [a-zA-Z]+ damage/;
+        const attackDamageRegexp = /[hH]it: [0-9]+ \([0-9]+d[0-9]+ (\+ [0-9]+)\) [a-zA-Z]+ damage/; // Replace whitespace with nothing!
+        const attackDamageTypeRegexp = /[hH]it: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) ([a-zA-Z]+) damage/;
 
-        const saveDCRegexp = /DC ([0-9]+) [a-zA-Z]+ saving throw./;
-        const saveAbilityRegexp = /DC [0-9]+ ([a-zA-Z]+) saving throw./;
+        const attack2DiceRegexp = /[hH]it: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) [a-zA-Z]+ damage and [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) [a-zA-Z]+ damage/;
+        const attack2DamageRegexp = /[hH]it: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) [a-zA-Z]+ damage and [0-9]+ \([0-9]+d[0-9]+ (\+ [0-9]+)\) [a-zA-Z]+ damage/; // Replace whitespace with nothing!
+        const attack2DamageTypeRegexp = /[hH]it: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) [a-zA-Z]+ damage and [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) ([a-zA-Z]+) damage/;
+
+        const saveDCRegexp = /DC ([0-9]+) [a-zA-Z]+ saving throw/;
+        const saveAbilityRegexp = /DC [0-9]+ ([a-zA-Z]+) saving throw/;
 
         const saveSuccessRegexp = /[sS]uccess: ([a-zA-Z0-9\(\)\+ ]+)\./;
 
         const saveFailureRegexp = /[fF]ailure: ([a-zA-Z0-9\(\)\+ ]+)\./;
-        const saveFailureDiceRegexp = /[fF]ailure: [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) [a-zA-Z]+ damage./;
-        const saveFailureDamageRegexp = /[fF]ailure: [0-9]+ \([0-9]+d[0-9]+ (\+ [0-9]+)\) [a-zA-Z]+ damage./; // Replace whitespace with nothing!
-        const saveFailureDamageTypeRegexp = /[fF]ailure: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) ([a-zA-Z]+) damage./;
+        const saveFailureDiceRegexp = /[fF]ailure: [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) [a-zA-Z]+ damage/;
+        const saveFailureDamageRegexp = /[fF]ailure: [0-9]+ \([0-9]+d[0-9]+ (\+ [0-9]+)\) [a-zA-Z]+ damage/; // Replace whitespace with nothing!
+        const saveFailureDamageTypeRegexp = /[fF]ailure: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) ([a-zA-Z]+) damage/;
+        
+        const saveFailure2DiceRegexp = /[fF]ailure: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) [a-zA-Z]+ damage and [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) [a-zA-Z]+ damage/;
+        const saveFailure2DamageRegexp = /[fF]ailure: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) [a-zA-Z]+ damage and [0-9]+ \([0-9]+d[0-9]+ (\+ [0-9]+)\) [a-zA-Z]+ damage/; // Replace whitespace with nothing!
+        const saveFailure2DamageTypeRegexp = /[fF]ailure: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) [a-zA-Z]+ damage and [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) ([a-zA-Z]+) damage/;
 
-        const healDiceRegexp = /[rR]egain [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) hitpoints./;
-        const healDamageRegexp = /[rR]egain [0-9]+ \([0-9]+d[0-9]+ (\+ [0-9]+)\) hitpoints./; // Replace whitespace with nothing!
+        const healDiceRegexp = /[rR]egain [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) hitpoints/;
+        const healDamageRegexp = /[rR]egain [0-9]+ \([0-9]+d[0-9]+ (\+ [0-9]+)\) hitpoints/; // Replace whitespace with nothing!
 
         let attackMod = detail.match(attackModRegexp);
         if (attackMod) {
@@ -239,6 +269,19 @@ function createButtons(elementType, key, element) {
         let attackDamageType = detail.match(attackDamageTypeRegexp);
         if (attackDamageType) {
             attackDamageType = attackDamageType[2];
+        }
+
+        let attack2Dice = detail.match(attack2DiceRegexp);
+        if (attack2Dice) {
+            attack2Dice = attack2Dice[2];
+        }
+        let attack2Damage = detail.match(attack2DamageRegexp);
+        if (attack2Damage) {
+            attack2Damage = attack2Damage[2].replace(' ', '');
+        }
+        let attack2DamageType = detail.match(attack2DamageTypeRegexp);
+        if (attack2DamageType) {
+            attack2DamageType = attack2DamageType[3];
         }
 
         let saveDC = detail.match(saveDCRegexp);
@@ -271,6 +314,19 @@ function createButtons(elementType, key, element) {
         if (saveFailureDamageType) {
             saveFailureDamageType = saveFailureDamageType[2];
         }
+        
+        let saveFailure2Dice = detail.match(saveFailure2DiceRegexp);
+        if (saveFailure2Dice) {
+            saveFailure2Dice = saveFailure2Dice[2];
+        }
+        let saveFailure2Damage = detail.match(saveFailure2DamageRegexp);
+        if (saveFailure2Damage) {
+            saveFailure2Damage = saveFailure2Damage[2].replace(' ', '');
+        }
+        let saveFailure2DamageType = detail.match(saveFailure2DamageTypeRegexp);
+        if (saveFailure2DamageType) {
+            saveFailure2DamageType = saveFailure2DamageType[3];
+        }
 
         let healDice = detail.match(healDiceRegexp);
         if (healDice) {
@@ -281,7 +337,7 @@ function createButtons(elementType, key, element) {
             healDamage = healDamage[1].replace(' ', '');
         }
 
-        child.onclick = function() { sendRoll(title, detail, rollTypes.ATTACK, attackMod, attackDice, attackDamage, attackDamageType, saveDC, saveAbility, saveSuccess, saveFailure, saveFailureDice, saveFailureDamage, saveFailureDamageType, healDice, healDamage); }
+        child.onclick = function() { sendRoll(title, detail, rollTypes.ATTACK, attackMod, attackDice, attackDamage, attackDamageType, saveDC, saveAbility, saveSuccess, saveFailure, saveFailureDice, saveFailureDamage, saveFailureDamageType, healDice, healDamage, attack2Dice, attack2Damage, attack2DamageType, saveFailure2Dice, saveFailure2Damage, saveFailure2DamageType); }
         child.append(source.cloneNode(true));
         source.classList.add('dc20-hidden');
         newElement.append(child);
