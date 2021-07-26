@@ -5,7 +5,7 @@ class TemplateStringBuilder {
 
         template += TemplateStringBuilder.getTitle(stats);
         template += TemplateStringBuilder.getSubheader(stats);
-        
+
         template += TemplateStringBuilder.getUses(stats);
 
         template += TemplateStringBuilder.getMainRoll(stats);
@@ -121,8 +121,8 @@ class TemplateStringBuilder {
     }
 
     static getPrimaryAttackDamageType(stats) {
-        if (stats.attackDamageType) {
-            return `{{attack_damage_type=${stats.attackDamageType}}}`;
+        if (stats.attackType) {
+            return `{{attack_damage_type=${stats.attackType}}}`;
         }
 
         return '';
