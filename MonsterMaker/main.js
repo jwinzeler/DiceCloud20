@@ -10,6 +10,7 @@ const states = {
     DISADVANTAGE: 3,
 }
 let rollState = states.NORMAL;
+let gmRoll = false;
 let menu;
 
 const ElementType = {
@@ -50,16 +51,19 @@ function sendRoll(title, description, type, attackMod = null, attackDice = null,
         diceRoll = '2d20kl1';
         advantage = '{{2d20kl1=1}}'
     }
-    rollState = states.NORMAL;
-    updateMenu();
 
     let message = '';
+
+    if (gmRoll) {
+        message += '/w gm ';
+    }
+
     switch (type) {
         case rollTypes.SIMPLE:
-            message = `&{template:5e-shaped} {{title=${title}}} ${advantage} {{roll1=[[${diceRoll}${attackMod}]]}}`;
+            message += `&{template:5e-shaped} {{title=${title}}} ${advantage} {{roll1=[[${diceRoll}${attackMod}]]}}`;
             break;
         case rollTypes.INFO: 
-            message = `&{template:5e-shaped} {{title=${title}}} ${advantage} {{subheader=${description}}}`;
+            message += `&{template:5e-shaped} {{title=${title}}} ${advantage} {{subheader=${description}}}`;
             break;
         case rollTypes.ATTACK:
             let attack = '';
@@ -111,7 +115,7 @@ function sendRoll(title, description, type, attackMod = null, attackDice = null,
                     heal += `{{heal=[[${healDice}]]}} `;
                 }
             }
-            message = `&{template:5e-shaped} {{title=${title}}} ${advantage} {{subheader=${description}}} ${attack} ${save} ${heal}`;
+            message += `&{template:5e-shaped} {{title=${title}}} ${advantage} {{subheader=${description}}} ${attack} ${save} ${heal}`;
             break;
     }
 
@@ -279,6 +283,11 @@ function updateElements() {
 
 function updateMenu() {
     const body = document.body;
+    if (gmRoll) {
+        body.classList.add('dc20-gmroll');
+    } else {
+        body.classList.remove('dc20-gmroll');
+    }
     switch(rollState) {
         case states.NORMAL:
             body.classList.remove('dc20-disadvantage');
@@ -297,6 +306,11 @@ function updateMenu() {
 
 function setRollState(state) {
     rollState = state;
+    updateMenu();
+}
+
+function toggleGMRoll() {
+    gmRoll = !gmRoll;
     updateMenu();
 }
 
@@ -329,6 +343,12 @@ function getMenuElements() {
     menu.classList.add('dc20-menu');
     menu.classList.add('dc20');
 
+    const gmroll = document.createElement('button');
+    gmroll.innerHTML = 'GM';
+    gmroll.classList.add('dc20-gmroll');
+    gmroll.classList.add('dc20-noadvantage');
+    gmroll.onclick = function() { toggleGMRoll(); }
+
     const advantage = document.createElement('button');
     advantage.innerHTML = '˄';
     advantage.classList.add('dc20-advantage');
@@ -347,6 +367,7 @@ function getMenuElements() {
     refresh.classList.add('dc20-noadvantage');
     refresh.onclick = function() { updateElements(); }
     
+    menu.append(gmroll);
     menu.append(advantage);
     menu.append(disadvantage);
     menu.append(refresh);

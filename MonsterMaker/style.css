@@ -4,6 +4,12 @@
     bottom: 5px;
 }
 
+.dc20-advantage .monster .monster-abilities .label,
+.dc20-disadvantage .monster .monster-abilities .label,
+.dc20-gmroll .monster .monster-abilities .label {
+    color: white;
+}
+
 .dc20-advantage .dc20 button:not(.dc20-noadvantage),
 .dc20-advantage button.dc20-advantage {
     background: #648f64;
@@ -13,6 +19,12 @@
 .dc20-disadvantage .dc20 button:not(.dc20-noadvantage),
 .dc20-disadvantage button.dc20-disadvantage {
     background: #9c6565;
+    color: white;
+}
+
+.dc20-gmroll .dc20 button:not(.dc20-noadvantage),
+.dc20-gmroll button.dc20-gmroll {
+    background: #283f57;
     color: white;
 }
 
@@ -36,6 +48,11 @@
 .dc20-disadvantage .dc20 button:hover:not(.dc20-noadvantage),
 .dc20-disadvantage button:hover.dc20-disadvantage {
     background: #835555;
+}
+
+.dc20-gmroll .dc20 button:hover:not(.dc20-noadvantage),
+.dc20-gmroll button:hover.dc20-gmroll {
+    background: #1e2f41;
 }
 
 .dc20-hidden {
