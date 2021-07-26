@@ -1,26 +1,36 @@
 {
     "name": "DiceCloud20",
-    "version": "0.4",
+    "version": "1.0",
     "description": "Simple integration between DiceCloud character sheets and the roll20 chat",
     "manifest_version": 2,
     "background": {
-        "scripts": ["Background/main.js"]
+        "scripts": [
+            "global/template-string-builder.js",
+            "global/template-stats.js",
+            "global/advantage-states.js",
+            "background/messager.js",
+            "background/main.js"
+        ]
     },
     "content_scripts": [
         {
             "matches": ["https://*.dicecloud.com/*"],
-            "css": ["DiceCloud/style.css"],
-            "js": ["DiceCloud/main.js"]
+            "css": ["dicecloud/style.css"],
+            "js": ["dicecloud/main.js"]
         },
         {
             "matches": ["https://app.roll20.net/*"],
-            "css": ["Roll20/style.css"],
-            "js": ["Roll20/main.js"]
+            "css": ["roll20/style.css"],
+            "js": ["roll20/main.js"]
         },
         {
             "matches": ["https://giffyglyph.com/monstermaker/app/*"],
-            "css": ["MonsterMaker/style.css"],
-            "js": ["MonsterMaker/main.js"]
+            "css": ["monstermaker/style.css"],
+            "js": [
+                "global/template-stats.js",
+                "global/advantage-states.js",
+                "monstermaker/main.js"
+            ]
         }
     ]
 }

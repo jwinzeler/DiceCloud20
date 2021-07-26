@@ -1,15 +1,4 @@
-const rollTypes = {
-    SIMPLE: 1,
-    INFO: 2,
-    ATTACK: 3,
-}
-
-const states = {
-    NORMAL: 1,
-    ADVANTAGE: 2,
-    DISADVANTAGE: 3,
-}
-let rollState = states.NORMAL;
+let rollState = advantageStates.NORMAL;
 let gmRoll = false;
 let menu;
 
@@ -38,108 +27,39 @@ const ElementType = {
         parent: ".monster-action",
         childSelector: "p",
         selector: "dc20-action",
+    },
+    REACTION: {
+        parent: ".monster-reaction",
+        childSelector: "p",
+        selector: "dc20-reaction",
     }
 }
 
-function sendRoll(title, description, type, attackMod = null, attackDice = null, attackDamage = null, attackDamageType = null, saveDC = null, saveAbility = null, saveSuccess = null, saveFailure = null, saveFailureDice = null, saveFailureDamage = null, saveFailureDamageType = null, healDice = null, healDamage = null, attack2Dice = null, attack2Damage = null, attack2DamageType = null, saveFailure2Dice = null, saveFailure2Damage = null, saveFailure2DamageType = null) {
-    let diceRoll = '1d20';
-    let advantage = '';
-    if (rollState == states.ADVANTAGE) {
-        diceRoll = '2d20kh1';
-        advantage = '{{2d20kh1=1}}'
-    } else if (rollState == states.DISADVANTAGE) {
-        diceRoll = '2d20kl1';
-        advantage = '{{2d20kl1=1}}'
-    }
-
-    let message = '';
-
-    if (gmRoll) {
-        message += '/w gm ';
-    }
-
-    switch (type) {
-        case rollTypes.SIMPLE:
-            message += `&{template:5e-shaped} {{title=${title}}} ${advantage} {{roll1=[[${diceRoll}${attackMod}]]}}`;
-            break;
-        case rollTypes.INFO: 
-            message += `&{template:5e-shaped} {{title=${title}}} ${advantage} {{subheader=${description}}}`;
-            break;
-        case rollTypes.ATTACK:
-            let attack = '';
-            if (attackMod) {
-                attack += `{{attack1=[[${diceRoll}${attackMod}]]}} `;
-            }
-            if (attackDice) {
-                if (attackDamage) {
-                    attack += `{{attack_damage=[[${attackDice}${attackDamage}]]}} {{attack_damage_crit=[[${attackDice}]]}} {{has_attack_damage=1}} `;
-                } else {
-                    attack += `{{attack_damage=[[${attackDice}]]}} {{attack_damage_crit=[[${attackDice}]]}} {{has_attack_damage=1}} `;
-                }
-            }
-            if (attackDamageType) {
-                attack += `{{attack_damage_type=${attackDamageType}}} `;
-            }
-
-            if (attack2Dice) {
-                if (attack2Damage) {
-                    attack += `{{attack_second_damage=[[${attack2Dice}${attack2Damage}]]}} {{attack_second_damage_crit=[[${attack2Dice}]]}} `;
-                } else {
-                    attack += `{{attack_second_damage=[[${attack2Dice}]]}} {{attack_second_damage_crit=[[${attack2Dice}]]}} `;
-                }
-            }
-            if (attack2DamageType) {
-                attack += `{{attack_second_damage_type=${attack2DamageType}}} `;
-            }
-
-            let save = '';
-            if (saveDC) {
-                save += `{{saving_throw_dc=${saveDC}}} `;
-            }
-            if (saveAbility) {
-                save += `{{saving_throw_vs_ability=${saveAbility.toUpperCase()}}} `
-            }
-            if (saveFailure) {
-                if (saveFailureDice) {
-                    save += `{{has_saving_throw_damage=1}} {{saving_throw_damage_macro=Saving throw failure:}} `
-                    if (saveFailureDamage) {
-                        save += `{{saving_throw_damage=[[${saveFailureDice}${saveFailureDamage}]]}} `;
-                    } else {
-                        save += `{{saving_throw_damage=[[${saveFailureDice}]]}} `;
-                    }
-                    if (saveFailureDamageType) {
-                        save += `{{saving_throw_damage_type=${saveFailureDamageType}}} `;
-                    }
-                }
-
-                if (saveFailure2Dice) {
-                    if (saveFailure2Damage) {
-                        save += `{{saving_throw_second_damage=[[${saveFailure2Dice}${saveFailure2Damage}]]}} `;
-                    } else {
-                        save += `{{saving_throw_second_damage=[[${saveFailure2Dice}]]}} `;
-                    }
-                    if (saveFailure2DamageType) {
-                        save += `{{saving_throw_second_damage_type=${saveFailure2DamageType}}} `;
-                    }
-                }
-            }
-            if (saveSuccess) {
-                save += `{{saving_throw_success=${saveSuccess}}} `;
-            }
-
-            let heal = '';
-            if (healDice) {
-                if (healDamage) {
-                    heal += `{{heal=[[${healDice}${healDamage}]]}} `;
-                } else {
-                    heal += `{{heal=[[${healDice}]]}} `;
-                }
-            }
-            message += `&{template:5e-shaped} {{title=${title}}} ${advantage} {{subheader=${description}}} {{text_top= }} ${attack} ${save} ${heal}`;
-            break;
-    }
-
-    chrome.runtime.sendMessage(message)
+function sendRoll(title = null, subheader = null, mainModifier = null, attackDice = null, attackModifier = null, attackType = null, saveDC = null, saveAbility = null, saveSuccess = null, saveFailureDice = null, saveFailureModifier = null, saveFailureDamageType = null, healDice = null, healModifier = null, attackSecondaryDice = null, attackSecondaryModifier = null, attackSecondaryType = null, saveFailureSecondaryDice = null, saveFailureSecondaryModifier = null, saveFailureSecondaryDamageType = null) {
+    chrome.runtime.sendMessage({
+        advantage: rollState,
+        gmroll: gmRoll,
+        title,
+        subheader,
+        mainModifier,
+        attackDice,
+        attackModifier,
+        attackType,
+        attackSecondaryDice,
+        attackSecondaryModifier,
+        attackSecondaryType,
+        saveDC,
+        saveAbility,
+        saveSuccess,
+        saveFailureDice,
+        saveFailureModifier,
+        saveFailureDamageType,
+        saveFailureSecondaryDice,
+        saveFailureSecondaryModifier,
+        saveFailureSecondaryDamageType,
+        healDice,
+        healModifier
+    });
 }
 
 function formatAbility(abilities) {
@@ -177,7 +97,7 @@ function createButtons(elementType, key, element) {
             const child = document.createElement('button');
             const title = formatTitle(key, e.querySelector('.label').innerHTML.trim());
             const modifier = /\(([+-−]\d+)\)/.exec(e.querySelector('.modifier').innerHTML.trim())[1].replace('−', '-');
-            child.onclick = function() { sendRoll(title, null, rollTypes.SIMPLE, modifier); }
+            child.onclick = function() { sendRoll(title, null, modifier); }
             child.append(e.cloneNode(true))
             newElement.append(child);
             e.classList.add('dc20-hidden');
@@ -190,7 +110,7 @@ function createButtons(elementType, key, element) {
             let title = formatTitle(key, s.trim().match(/[a-zA-Z\/]+/)[0]);
             let modifier = s.trim().match(/[+-−][0-9]+/)[0].replace('−', '-');
             const child = document.createElement('button');
-            child.onclick = function() { sendRoll(title, null, rollTypes.SIMPLE, modifier); }
+            child.onclick = function() { sendRoll(title, null, modifier); }
             child.innerHTML = s;
             newElement.append(child);
         });
@@ -201,32 +121,18 @@ function createButtons(elementType, key, element) {
         let title = source.querySelector('.name').innerHTML.trim();
         let detail = source.querySelector('.detail').innerHTML.trim();
         const child = document.createElement('button');
-        child.onclick = function() { sendRoll(title, detail, rollTypes.INFO); }
+        child.onclick = function() { sendRoll(title, detail); }
         child.append(source.cloneNode(true));
         child.classList.add('dc20-noadvantage');
         source.classList.add('dc20-hidden');
         newElement.append(child);
         element.append(newElement);
-    } else if (["ACTION"].includes(key)) {
+    } else if (["ACTION", "REACTION"].includes(key)) {
         const source = element.querySelector(elementType.childSelector);
         const child = document.createElement('button');
 
         let title = source.querySelector('.name').innerHTML.trim().replace('.', '');
         let detail = source.querySelector('.detail').innerHTML.trim().replace('<i>', '').replace('</i>', '').replace('<b>', '').replace('</b>', '');
-
-        /**
-         * Action Templates:
-         * Attack: ```+9 to hit```
-         * Attack damage: ```Hit: 33 (1d10 + 5) slashing damage```
-         * Second damage: ```Hit: 33 (1d10 + 5) slashing damage and  33 (1d10 + 5) piercing damage```
-         * Saving Throw: ```DC 17 Strength saving throw```
-         * On Failure: ```Failure: 33 (6d10) fire damage```
-         * Second Failure: ```Failure: 33 (1d10 + 5) fire damage and  33 (1d10 + 5) thunder damage```
-         * On Success: ```Success: Any text goes here, no rolls though```
-         * Heals: ```Regain 33 (3d20 + 2) hitpoints```
-         * 
-         * Format for rolls can be either ```33 (1d10 + 5)``` or ```33 (1d10)```
-         */
 
         const attackModRegexp = /([+-−][0-9]+) to hit/;
         const attackDiceRegexp = /[hH]it: [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) [a-zA-Z]+ damage/;
@@ -337,7 +243,7 @@ function createButtons(elementType, key, element) {
             healDamage = healDamage[1].replace(' ', '');
         }
 
-        child.onclick = function() { sendRoll(title, detail, rollTypes.ATTACK, attackMod, attackDice, attackDamage, attackDamageType, saveDC, saveAbility, saveSuccess, saveFailure, saveFailureDice, saveFailureDamage, saveFailureDamageType, healDice, healDamage, attack2Dice, attack2Damage, attack2DamageType, saveFailure2Dice, saveFailure2Damage, saveFailure2DamageType); }
+        child.onclick = function() { sendRoll(title, detail, attackMod, attackDice, attackDamage, attackDamageType, saveDC, saveAbility, saveSuccess, saveFailureDice, saveFailureDamage, saveFailureDamageType, healDice, healDamage, attack2Dice, attack2Damage, attack2DamageType, saveFailure2Dice, saveFailure2Damage, saveFailure2DamageType); }
         child.append(source.cloneNode(true));
         source.classList.add('dc20-hidden');
         newElement.append(child);
@@ -426,15 +332,15 @@ function updateMenu() {
         body.classList.remove('dc20-gmroll');
     }
     switch(rollState) {
-        case states.NORMAL:
+        case advantageStates.NORMAL:
             body.classList.remove('dc20-disadvantage');
             body.classList.remove('dc20-advantage');
             break;
-        case states.DISADVANTAGE:
+        case advantageStates.DISADVANTAGE:
             body.classList.add('dc20-disadvantage');
             body.classList.remove('dc20-advantage');
             break;
-        case states.ADVANTAGE:
+        case advantageStates.ADVANTAGE:
             body.classList.remove('dc20-disadvantage');
             body.classList.add('dc20-advantage');
             break;
@@ -453,24 +359,24 @@ function toggleGMRoll() {
 
 function toggleAdvantage() {
     switch(rollState) {
-        case states.NORMAL:
-        case states.DISADVANTAGE:
-            setRollState(states.ADVANTAGE);
+        case advantageStates.NORMAL:
+        case advantageStates.DISADVANTAGE:
+            setRollState(advantageStates.ADVANTAGE);
             break;
-        case states.ADVANTAGE:
-            setRollState(states.NORMAL);
+        case advantageStates.ADVANTAGE:
+            setRollState(advantageStates.NORMAL);
             break;
     }
 }
 
 function toggleDisadvantage() {
     switch(rollState) {
-        case states.NORMAL:
-        case states.ADVANTAGE:
-            setRollState(states.DISADVANTAGE);
+        case advantageStates.NORMAL:
+        case advantageStates.ADVANTAGE:
+            setRollState(advantageStates.DISADVANTAGE);
             break;
-        case states.DISADVANTAGE:
-            setRollState(states.NORMAL);
+        case advantageStates.DISADVANTAGE:
+            setRollState(advantageStates.NORMAL);
             break;
     }
 }

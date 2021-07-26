@@ -70,7 +70,8 @@
     justify-content: space-around !important;
 }
 
-.dc20-action button {
+.dc20-action button,
+.dc20-reaction button {
     text-align: left;
 }
 
