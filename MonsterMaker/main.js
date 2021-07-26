@@ -90,17 +90,15 @@ function sendRoll(title, description, type, attackMod = null, attackDice = null,
             }
             if (saveFailure) {
                 if (saveFailureDice) {
-                    save += `{{has_saving_throw_damage=1}} `
+                    save += `{{has_saving_throw_damage=1}} {{saving_throw_damage_macro=Saving throw failure:}} `
                     if (saveFailureDamage) {
                         save += `{{saving_throw_damage=[[${saveFailureDice}${saveFailureDamage}]]}} `;
                     } else {
                         save += `{{saving_throw_damage=[[${saveFailureDice}]]}} `;
                     }
-                } else {
-                    // save += `{{saving_throw_failure=${saveFailure}}}`
-                }
-                if (saveFailureDamageType) {
-                    save += `{{saving_throw_damage_type=${saveFailureDamageType}}} `;
+                    if (saveFailureDamageType) {
+                        save += `{{saving_throw_damage_type=${saveFailureDamageType}}} `;
+                    }
                 }
             }
             if (saveSuccess) {
@@ -115,11 +113,35 @@ function sendRoll(title, description, type, attackMod = null, attackDice = null,
                     heal += `{{heal=[[${healDice}]]}} `;
                 }
             }
-            message += `&{template:5e-shaped} {{title=${title}}} ${advantage} {{subheader=${description}}} ${attack} ${save} ${heal}`;
+            message += `&{template:5e-shaped} {{title=${title}}} ${advantage} {{subheader=${description}}} {{text_top= }} ${attack} ${save} ${heal}`;
             break;
     }
 
     chrome.runtime.sendMessage(message)
+}
+
+function formatAbility(abilities) {
+    if (abilities.replace) {
+        return abilities
+            .replace('Str', 'Strength')
+            .replace('Dex', 'Dexterity')
+            .replace('Con', 'Constitution')
+            .replace('Int', 'Intelligence')
+            .replace('Wis', 'Wisdom')
+            .replace('Cha', 'Charisma')
+            .replaceAll('/', ' / ');
+    }
+    return abilities;
+}
+
+function formatTitle(key, string) {
+    string = formatAbility(string);
+    switch (key) {
+        case 'SAVE':
+            return string += ' Saving Throw';
+        default:
+            return string;
+    }
 }
 
 function createButtons(elementType, key, element) {
@@ -131,7 +153,7 @@ function createButtons(elementType, key, element) {
         const elements = element.querySelectorAll(elementType.childSelector);
         elements.forEach(e => {
             const child = document.createElement('button');
-            const title = e.querySelector('.label').innerHTML.trim();
+            const title = formatTitle(key, e.querySelector('.label').innerHTML.trim());
             const modifier = /\(([+-−]\d+)\)/.exec(e.querySelector('.modifier').innerHTML.trim())[1].replace('−', '-');
             child.onclick = function() { sendRoll(title, null, rollTypes.SIMPLE, modifier); }
             child.append(e.cloneNode(true))
@@ -143,7 +165,7 @@ function createButtons(elementType, key, element) {
         const source = element.querySelector(elementType.childSelector);
         strings = source.innerHTML.trim().split(', ');
         strings.forEach(s => {
-            let title = s.trim().match(/[a-zA-Z\/]+/);
+            let title = formatTitle(key, s.trim().match(/[a-zA-Z\/]+/)[0]);
             let modifier = s.trim().match(/[+-−][0-9]+/)[0].replace('−', '-');
             const child = document.createElement('button');
             child.onclick = function() { sendRoll(title, null, rollTypes.SIMPLE, modifier); }
@@ -167,14 +189,21 @@ function createButtons(elementType, key, element) {
         const source = element.querySelector(elementType.childSelector);
         const child = document.createElement('button');
 
-        let title = source.querySelector('.name').innerHTML.trim();
-        let detail = source.querySelector('.detail').innerHTML.trim();
+        let title = source.querySelector('.name').innerHTML.trim().replace('.', '');
+        let detail = source.querySelector('.detail').innerHTML.trim().replace('<i>', '').replace('</i>', '').replace('<b>', '').replace('</b>', '');
 
         /**
          * Action Templates:
-         * Attack: +3 to hit. Hit: 10 (1d10 + 4) slashing damage.
-         * Save: DC 13 Strength saving throw. Success: 5 (1d6 + 2) thunder damage. Failure: 10 (1d10 + 4) fire damage.
-         * Save: DC 13 Dexterity saving throw. Success: Yadayada. Failure: Half damage.
+         * Attack: +9 to hit.
+         * Attack damage: Hit 33 (1d10) slashing damage.
+         * Attack damage: Hit 33 (1d10 + 5) slashing damage.
+         * Saving Throw: DC 17 Strength saving throw.
+         * On Failure: Failure: 33 (6d10) fire damage.
+         * On Failure: Failure: 33 (6d10 + 5) fire damage.
+         * On Success: Success: Half Damage.
+         * On Success: Success: I can't do rolls :(.
+         * Heals: Regain 33 (3d20 + 2) hitpoints
+         * Heals: Regain 33 (3d20) hitpoints
          */
 
         const attackModRegexp = /([+-−][0-9]+) to hit./;
@@ -185,9 +214,9 @@ function createButtons(elementType, key, element) {
         const saveDCRegexp = /DC ([0-9]+) [a-zA-Z]+ saving throw./;
         const saveAbilityRegexp = /DC [0-9]+ ([a-zA-Z]+) saving throw./;
 
-        const saveSuccessRegexp = /[sS]uccess: ([a-zA-Z0-9\(\)\+ ]+\.)/;
+        const saveSuccessRegexp = /[sS]uccess: ([a-zA-Z0-9\(\)\+ ]+)\./;
 
-        const saveFailureRegexp = /[fF]ailure: ([a-zA-Z0-9\(\)\+ ]+\.)/;
+        const saveFailureRegexp = /[fF]ailure: ([a-zA-Z0-9\(\)\+ ]+)\./;
         const saveFailureDiceRegexp = /[fF]ailure: [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) [a-zA-Z]+ damage./;
         const saveFailureDamageRegexp = /[fF]ailure: [0-9]+ \([0-9]+d[0-9]+ (\+ [0-9]+)\) [a-zA-Z]+ damage./; // Replace whitespace with nothing!
         const saveFailureDamageTypeRegexp = /[fF]ailure: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) ([a-zA-Z]+) damage./;
