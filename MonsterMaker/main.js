@@ -36,7 +36,7 @@ const ElementType = {
 }
 
 function sendRoll(title = null, subheader = null, mainModifier = null, attackDice = null, attackModifier = null, attackType = null, saveDC = null, saveAbility = null, saveSuccess = null, saveFailureDice = null, saveFailureModifier = null, saveFailureDamageType = null, healDice = null, healModifier = null, attackSecondaryDice = null, attackSecondaryModifier = null, attackSecondaryType = null, saveFailureSecondaryDice = null, saveFailureSecondaryModifier = null, saveFailureSecondaryDamageType = null) {
-    chrome.runtime.sendMessage({
+    const message = TemplateStringBuilder.getTemplate({
         advantage: rollState,
         gmroll: gmRoll,
         title,
@@ -59,7 +59,8 @@ function sendRoll(title = null, subheader = null, mainModifier = null, attackDic
         saveFailureSecondaryDamageType,
         healDice,
         healModifier
-    });
+    })
+    chrome.runtime.sendMessage(message);
 }
 
 function formatAbility(abilities) {

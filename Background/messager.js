@@ -29,11 +29,10 @@ class Messager {
                     }
                 } else if (sender.origin === "https://giffyglyph.com") {
                     if (this.roll20) {
-                        const template = TemplateStringBuilder.getTemplate(request);
-                        console.log("Sending Message to Roll20", request, sendResponse, template);
-                        chrome.tabs.sendMessage(this.roll20.tab.id, template);
+                        console.log("Sending Message to Roll20", request, sendResponse);
+                        chrome.tabs.sendMessage(this.roll20.tab.id, request);
                     } else {
-                        console.warn("Attempted to send Message to Roll20 but it hasn't been initated.", request, sendResponse);
+                        console.warn("Attempted to send Message to Giffyglyph but it hasn't been initated.", request, sendResponse);
                         chrome.tabs.sendMessage(this.monsterMaker.tab.id, "noRoll20");
                     }
                 } else if (sender.origin === "https://app.roll20.net") {
