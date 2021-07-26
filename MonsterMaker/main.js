@@ -240,9 +240,9 @@ function createButtons(elementType, key, element) {
         const saveDCRegexp = /DC ([0-9]+) [a-zA-Z]+ saving throw/;
         const saveAbilityRegexp = /DC [0-9]+ ([a-zA-Z]+) saving throw/;
 
-        const saveSuccessRegexp = /[sS]uccess: ([a-zA-Z0-9\(\)\+ ]+)\./;
+        const saveSuccessRegexp = /[sS]uccess: ([^\.]+)\./;
 
-        const saveFailureRegexp = /[fF]ailure: ([a-zA-Z0-9\(\)\+ ]+)\./;
+        const saveFailureRegexp = /[fF]ailure: ([^\.]+)\./;
         const saveFailureDiceRegexp = /[fF]ailure: [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) [a-zA-Z]+ damage/;
         const saveFailureDamageRegexp = /[fF]ailure: [0-9]+ \([0-9]+d[0-9]+ (\+ [0-9]+)\) [a-zA-Z]+ damage/; // Replace whitespace with nothing!
         const saveFailureDamageTypeRegexp = /[fF]ailure: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) ([a-zA-Z]+) damage/;
@@ -364,6 +364,58 @@ function updateElements() {
             createButtons(elementType, key, element);
         });
     };
+
+    addActionLegend();
+}
+
+function addActionLegend() {
+    const actions = document.querySelector('.repeatable-section[data-path=actions] #blueprint-action');
+    const old = actions.querySelector('.dc20-legend');
+    if (old) {
+        actions.removeChild(old);
+    }
+
+    const actionList = {
+        'Attack': ['+9 to hit.&nbsp;', '[attack] to hit.&nbsp;'],
+        'Attack Damage': ['Hit: 33 (1d10 + 5) slashing damage.&nbsp;', 'Hit: [damage, d10] slashing damage.&nbsp;'],
+        'Attack Multiple Damage Types': ['Hit: 30 (5d10 + 3) slashing damage and 14 (5d4 + 2) fire damage.&nbsp;', 'Hit: [damage, d10] slashing damage and [14, d4] fire damage.&nbsp;'],
+        'Saving Throw': ['DC 17 Strength saving throw.&nbsp;', '[dc-primary] Strength saving throw.&nbsp;'],
+        'Save Failure': ['Failure: 30 (5d10 + 3) fire damage.&nbsp;', 'Failure: [damage, d10] fire damage.&nbsp;'],
+        'Save Failure Multiple Damage Types': ['Failure: 30 (5d10 + 3) fire damage and 14 (5d4 + 2) thunder damage.&nbsp;', 'Failure: [damage, d10] fire damage and [14, d4] thunder damage.&nbsp;'],
+        'Save Success': ['Success: Any text goes here, no rolls though :(.&nbsp;'],
+        'Heal': ['Regain 30 (2d20 + 9) hitpoints.&nbsp;', 'Regain [damage, d20] hitpoints.&nbsp;'],
+    }
+
+    const legend = document.createElement('div');
+    legend.classList.add('repeatable-item');
+    legend.classList.add('dc20-legend');
+
+    const title = document.createElement('div');
+    title.classList.add('dc20-title');
+    title.innerHTML = 'DiceCloud20 Action Templates'
+    legend.append(title);
+
+    for (const [key, action] of Object.entries(actionList)) {
+        const label = document.createElement('label');
+        label.innerHTML = key;
+
+        const description = document.createElement('div');
+        description.classList.add('dc20-description');
+
+        action.forEach(a => {
+            const code = document.createElement('code');
+            code.innerHTML = a;
+            description.append(code);
+        });
+    
+        const formGroup = document.createElement('div');
+        formGroup.classList.add('form-group');
+        formGroup.append(label);
+        formGroup.append(description);
+        legend.append(formGroup);
+    }
+
+    actions.append(legend);
 }
 
 function updateMenu() {

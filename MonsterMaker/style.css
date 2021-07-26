@@ -73,3 +73,32 @@
 .dc20-action button {
     text-align: left;
 }
+
+.dc20-legend .dc20-title {
+    text-align: center;
+    background: rgba(222, 226, 230, 0.5);
+    border-top: 1px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+    padding: 10px;
+    font-weight: bold;
+}
+
+.dc20-legend label {
+    font-size: 12px;
+}
+
+.dc20-legend .dc20-description {
+    font-size: 12px;
+    vertical-align: center;
+    padding: 3px;
+}
+
+.dc20-legend code {
+    border: 1px solid rgba(172, 191, 207, 0.5);
+    background: rgba(201, 222, 241, .5);
+    color: rgb(79, 85, 94);
+    padding: 2px;
+    border-radius: 2px;
+    display: block;
+    margin: 2px;
+}
