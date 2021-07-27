@@ -7,7 +7,7 @@
  * Capture Groups:
  * 1: To hit modifier e.g. +5
  */
-const modifierRegex = /([+-]\d+)/;
+const modifierRegex = /([+-]{1,2}\d+)/;
 
 /**
  * Matches a save DC and ability, for example:
@@ -32,7 +32,7 @@ const saveDCRegex = /(\d+)([a-zA-Z]{3})/;
  * 2: modifier e.g. +5, 10, -5
  * 3: type e.g. fire, piercing, banana
  */
-const damageRegex = /(\d+d\d+)*([+-]?\d+)*([a-z]*)/;
+const damageRegex = /(\d+d\d+)*([+-]{0,2}\d+)*([a-z]*)/;
 
 /**
  * Matches an entire attack roll, for example:
@@ -82,7 +82,7 @@ const saveRegex = new RegExp(`\\[${saveDCRegex.source}(:${damageRegex.source})?(
  * 1: dice e.g. 2d6
  * 2: modifier e.g. +5, 10, -5
  */
-const healRegex = /\[[hH]eal:(\d+d\d+)*([+-]?\d+)*\]/;
+const healRegex = /\[[hH]eal:(\d+d\d+)*([+-]{0,2}\d+)*\]/;
 
 /**
  * Matches any extra damage that does not require a hit or save, for example:
