@@ -71,7 +71,13 @@ function formatTitle(key, string) {
 function createInitiativeButton(modifier) {
     const skills = document.querySelector('.monster-skills span:nth-child(2)');
     if (skills) {
-        skills.innerHTML = `Initiative ${modifier}, ${skills.innerHTML}`;
+        skills.innerHTML = skills.innerHTML.replace(`Initiative ${modifier}, `, '');
+        skills.innerHTML = skills.innerHTML.replace(`Initiative ${modifier}`, '');
+        if (skills.innerHTML === '') {
+            skills.innerHTML = `Initiative ${modifier}`;
+        } else {
+            skills.innerHTML = `Initiative ${modifier}, ${skills.innerHTML}`;
+        }
     } else {
         const label = document.createElement('span');
         label.classList.add('label');
