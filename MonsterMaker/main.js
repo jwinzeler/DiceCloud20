@@ -70,10 +70,30 @@ function formatTitle(key, string) {
 
 function createInitiativeButton(modifier) {
     const skills = document.querySelector('.monster-skills span:nth-child(2)');
-    if (skills.innerHTML) {
+    if (skills) {
         skills.innerHTML = `Initiative ${modifier}, ${skills.innerHTML}`;
     } else {
-        skills.innerHTML = `Initiative ${modifier}`;
+        const label = document.createElement('span');
+        label.classList.add('label');
+        label.innerHTML = 'Skills';
+        const skill = document.createElement('span');
+        skill.innerHTML = `Initiative ${modifier}`;
+        const p = document.createElement('p');
+        p.append(label);
+        p.append(skill);
+        const monsterSkills = document.createElement('li');
+        monsterSkills.classList.add('monster-skills');
+        monsterSkills.append(p);
+        
+        const monsterSaves = document.querySelector('.monster-saves');
+        if (monsterSaves) {
+            monsterSaves.insertAdjacentElement('afterend', monsterSkills);
+        } else {
+            const monsterStats = document.querySelector('.monster-stats');
+            if (monsterStats) {
+                monsterStats.append(monsterSkills);
+            }
+        }
     }
 }
 
@@ -257,7 +277,6 @@ function createButtons(elementType, key, element) {
         if (subheader === '.') {
             subheader = undefined;
         }
-        console.log(subheader);
 
         child.onclick = function() { sendRoll({
             title,
