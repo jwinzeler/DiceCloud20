@@ -35,31 +35,11 @@ const ElementType = {
     }
 }
 
-function sendRoll(title = null, subheader = null, mainModifier = null, attackDice = null, attackModifier = null, attackType = null, saveDC = null, saveAbility = null, saveSuccess = null, saveFailureDice = null, saveFailureModifier = null, saveFailureDamageType = null, healDice = null, healModifier = null, attackSecondaryDice = null, attackSecondaryModifier = null, attackSecondaryType = null, saveFailureSecondaryDice = null, saveFailureSecondaryModifier = null, saveFailureSecondaryDamageType = null, isInitiative = null) {
+function sendRoll(info) {
     const message = TemplateStringBuilder.getTemplate({
         advantage: rollState,
         isGmroll: gmRoll,
-        isInitiative,
-        title,
-        subheader,
-        mainModifier,
-        attackDice,
-        attackModifier,
-        attackType,
-        attackSecondaryDice,
-        attackSecondaryModifier,
-        attackSecondaryType,
-        saveDC,
-        saveAbility,
-        saveSuccess,
-        saveFailureDice,
-        saveFailureModifier,
-        saveFailureDamageType,
-        saveFailureSecondaryDice,
-        saveFailureSecondaryModifier,
-        saveFailureSecondaryDamageType,
-        healDice,
-        healModifier
+        ...info
     });
     chrome.runtime.sendMessage(message);
 }
@@ -88,6 +68,15 @@ function formatTitle(key, string) {
     }
 }
 
+function createInitiativeButton(modifier) {
+    const skills = document.querySelector('.monster-skills span:nth-child(2)');
+    if (skills.innerHTML) {
+        skills.innerHTML = `Initiative ${modifier}, ${skills.innerHTML}`;
+    } else {
+        skills.innerHTML = `Initiative ${modifier}`;
+    }
+}
+
 function createButtons(elementType, key, element) {
     const newElement = document.createElement('div');
     newElement.classList.add('dc20');
@@ -99,10 +88,14 @@ function createButtons(elementType, key, element) {
             const child = document.createElement('button');
             const title = formatTitle(key, e.querySelector('.label').innerHTML.trim());
             const modifier = /\(([+-−]\d+)\)/.exec(e.querySelector('.modifier').innerHTML.trim())[1].replace('−', '-');
-            child.onclick = function() { sendRoll(title, null, modifier); }
+            child.onclick = function() { sendRoll({title, mainModifier: modifier}); }
             child.append(e.cloneNode(true))
             newElement.append(child);
             e.classList.add('dc20-hidden');
+
+            if (title === 'Dexterity' && modifier) {
+                createInitiativeButton(modifier);
+            }
         });
         element.append(newElement);
     } else if (["SAVE", "SKILL"].includes(key)) {
@@ -112,7 +105,11 @@ function createButtons(elementType, key, element) {
             let title = formatTitle(key, s.trim().match(/[a-zA-Z\/]+/)[0]);
             let modifier = s.trim().match(/[+-−][0-9]+/)[0].replace('−', '-');
             const child = document.createElement('button');
-            child.onclick = function() { sendRoll(title, null, modifier); }
+            child.onclick = function() { sendRoll({
+                title,
+                mainModifier: modifier,
+                isInitiative: title === 'Initiative' ? true : undefined,
+            }); }
             child.innerHTML = s;
             newElement.append(child);
         });
@@ -123,7 +120,7 @@ function createButtons(elementType, key, element) {
         let title = source.querySelector('.name').innerHTML.trim();
         let detail = source.querySelector('.detail').innerHTML.trim();
         const child = document.createElement('button');
-        child.onclick = function() { sendRoll(title, detail); }
+        child.onclick = function() { sendRoll({title, subheader: detail}); }
         child.append(source.cloneNode(true));
         child.classList.add('dc20-noadvantage');
         source.classList.add('dc20-hidden');
@@ -134,7 +131,7 @@ function createButtons(elementType, key, element) {
         const child = document.createElement('button');
 
         let title = source.querySelector('.name').innerHTML.trim().replace('.', '');
-        let detail = source.querySelector('.detail').innerHTML.trim().replace('<i>', '').replace('</i>', '').replace('<b>', '').replace('</b>', '');
+        let subheader = source.querySelector('.detail').innerHTML.trim().replace('<i>', '').replace('</i>', '').replace('<b>', '').replace('</b>', '');
 
         const attackModRegexp = /([+-−][0-9]+) to hit/;
         const attackDiceRegexp = /[hH]it: [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) [a-zA-Z]+ damage/;
@@ -162,90 +159,129 @@ function createButtons(elementType, key, element) {
         const healDiceRegexp = /[rR]egain [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) hitpoints/;
         const healDamageRegexp = /[rR]egain [0-9]+ \([0-9]+d[0-9]+ (\+ [0-9]+)\) hitpoints/; // Replace whitespace with nothing!
 
-        let attackMod = detail.match(attackModRegexp);
-        if (attackMod) {
-            attackMod = attackMod[1].replace('−', '-');
+        let mainModifier = subheader.match(attackModRegexp);
+        if (mainModifier) {
+            mainModifier = mainModifier[1].replace('−', '-');
         }
-        let attackDice = detail.match(attackDiceRegexp);
+        let attackDice = subheader.match(attackDiceRegexp);
         if (attackDice) {
             attackDice = attackDice[1];
         }
-        let attackDamage = detail.match(attackDamageRegexp);
-        if (attackDamage) {
-            attackDamage = attackDamage[1].replace(' ', '');
+        let attackModifier = subheader.match(attackDamageRegexp);
+        if (attackModifier) {
+            attackModifier = attackModifier[1].replace(' ', '');
         }
-        let attackDamageType = detail.match(attackDamageTypeRegexp);
-        if (attackDamageType) {
-            attackDamageType = attackDamageType[2];
-        }
-
-        let attack2Dice = detail.match(attack2DiceRegexp);
-        if (attack2Dice) {
-            attack2Dice = attack2Dice[2];
-        }
-        let attack2Damage = detail.match(attack2DamageRegexp);
-        if (attack2Damage) {
-            attack2Damage = attack2Damage[2].replace(' ', '');
-        }
-        let attack2DamageType = detail.match(attack2DamageTypeRegexp);
-        if (attack2DamageType) {
-            attack2DamageType = attack2DamageType[3];
+        let attackType = subheader.match(attackDamageTypeRegexp);
+        if (attackType) {
+            attackType = attackType[2];
         }
 
-        let saveDC = detail.match(saveDCRegexp);
+        let attackSecondaryDice = subheader.match(attack2DiceRegexp);
+        if (attackSecondaryDice) {
+            attackSecondaryDice = attackSecondaryDice[2];
+        }
+        let attackSecondaryModifier = subheader.match(attack2DamageRegexp);
+        if (attackSecondaryModifier) {
+            attackSecondaryModifier = attackSecondaryModifier[2].replace(' ', '');
+        }
+        let attackSecondaryType = subheader.match(attack2DamageTypeRegexp);
+        if (attackSecondaryType) {
+            attackSecondaryType = attackSecondaryType[3];
+        }
+
+        let saveDC = subheader.match(saveDCRegexp);
         if (saveDC) {
             saveDC = saveDC[1];
         }
-        let saveAbility = detail.match(saveAbilityRegexp);
+        let saveAbility = subheader.match(saveAbilityRegexp);
         if (saveAbility) {
             saveAbility = saveAbility[1];
         }
 
-        let saveSuccess = detail.match(saveSuccessRegexp);
+        let saveSuccess = subheader.match(saveSuccessRegexp);
         if (saveSuccess) {
             saveSuccess = saveSuccess[1];
         }
 
-        let saveFailure = detail.match(saveFailureRegexp);
+        let saveFailure = subheader.match(saveFailureRegexp);
         if (saveFailure) {
             saveFailure = saveFailure[1];
         }
-        let saveFailureDice = detail.match(saveFailureDiceRegexp);
+        let saveFailureDice = subheader.match(saveFailureDiceRegexp);
         if (saveFailureDice) {
             saveFailureDice = saveFailureDice[1];
         }
-        let saveFailureDamage = detail.match(saveFailureDamageRegexp);
-        if (saveFailureDamage) {
-            saveFailureDamage = saveFailureDamage[1].replace(' ', '');
+        let saveFailureModifier = subheader.match(saveFailureDamageRegexp);
+        if (saveFailureModifier) {
+            saveFailureModifier = saveFailureModifier[1].replace(' ', '');
         }
-        let saveFailureDamageType = detail.match(saveFailureDamageTypeRegexp);
+        let saveFailureDamageType = subheader.match(saveFailureDamageTypeRegexp);
         if (saveFailureDamageType) {
             saveFailureDamageType = saveFailureDamageType[2];
         }
         
-        let saveFailure2Dice = detail.match(saveFailure2DiceRegexp);
-        if (saveFailure2Dice) {
-            saveFailure2Dice = saveFailure2Dice[2];
+        let saveFailureSecondaryDice = subheader.match(saveFailure2DiceRegexp);
+        if (saveFailureSecondaryDice) {
+            saveFailureSecondaryDice = saveFailureSecondaryDice[2];
         }
-        let saveFailure2Damage = detail.match(saveFailure2DamageRegexp);
-        if (saveFailure2Damage) {
-            saveFailure2Damage = saveFailure2Damage[2].replace(' ', '');
+        let saveFailureSecondaryModifier = subheader.match(saveFailure2DamageRegexp);
+        if (saveFailureSecondaryModifier) {
+            saveFailureSecondaryModifier = saveFailureSecondaryModifier[2].replace(' ', '');
         }
-        let saveFailure2DamageType = detail.match(saveFailure2DamageTypeRegexp);
-        if (saveFailure2DamageType) {
-            saveFailure2DamageType = saveFailure2DamageType[3];
+        let saveFailureSecondaryDamageType = subheader.match(saveFailure2DamageTypeRegexp);
+        if (saveFailureSecondaryDamageType) {
+            saveFailureSecondaryDamageType = saveFailureSecondaryDamageType[3];
         }
 
-        let healDice = detail.match(healDiceRegexp);
+        let healDice = subheader.match(healDiceRegexp);
         if (healDice) {
             healDice = healDice[1];
         }
-        let healDamage = detail.match(healDamageRegexp);
-        if (healDamage) {
-            healDamage = healDamage[1].replace(' ', '');
+        let healModifier = subheader.match(healDamageRegexp);
+        if (healModifier) {
+            healModifier = healModifier[1].replace(' ', '');
         }
 
-        child.onclick = function() { sendRoll(title, detail, attackMod, attackDice, attackDamage, attackDamageType, saveDC, saveAbility, saveSuccess, saveFailureDice, saveFailureDamage, saveFailureDamageType, healDice, healDamage, attack2Dice, attack2Damage, attack2DamageType, saveFailure2Dice, saveFailure2Damage, saveFailure2DamageType); }
+        subheader = subheader
+            .replace(attackModRegexp, '')
+            .replace(attack2DiceRegexp, '')
+            .replace(attackDiceRegexp, '')
+            .replace(saveDCRegexp, '')
+            .replace(saveSuccessRegexp, '')
+            .replace(saveFailureRegexp, '')
+            .replace(healDiceRegexp, '')
+            .replace(/<[^>]*>/g, '')
+            .replaceAll('&nbsp;.', '')
+            .replaceAll(' .', '')
+            .trim();
+        if (subheader === '.') {
+            subheader = undefined;
+        }
+        console.log(subheader);
+
+        child.onclick = function() { sendRoll({
+            title,
+            subheader,
+            mainModifier,
+            attackDice,
+            attackModifier,
+            attackType,
+            attackSecondaryDice,
+            attackSecondaryModifier,
+            attackSecondaryType,
+            saveDC,
+            saveAbility,
+            saveSuccess,
+            saveFailureDice,
+            saveFailureModifier,
+            saveFailureDamageType,
+            saveFailureSecondaryDice,
+            saveFailureSecondaryModifier,
+            saveFailureSecondaryDamageType,
+            healDice,
+            healModifier
+        }); }
+        
         child.append(source.cloneNode(true));
         source.classList.add('dc20-hidden');
         newElement.append(child);
