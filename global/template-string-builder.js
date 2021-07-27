@@ -28,6 +28,12 @@ class TemplateStringBuilder {
         template += TemplateStringBuilder.getSecondarySaveFailure(stats);
         template += TemplateStringBuilder.getSecondarySaveFailureType(stats);
 
+        template += TemplateStringBuilder.getPrimaryOtherDamage(stats);
+        template += TemplateStringBuilder.getPrimaryOtherDamageType(stats);
+
+        template += TemplateStringBuilder.getSecondaryOtherDamage(stats);
+        template += TemplateStringBuilder.getSecondaryOtherDamageType(stats);
+
         template += TemplateStringBuilder.getHeal(stats);
 
         return template;
@@ -215,6 +221,46 @@ class TemplateStringBuilder {
     static getSecondarySaveFailureType(stats) {
         if (stats.saveFailureSecondaryDamageType) {
             return `{{saving_throw_second_damage_type=${stats.saveFailureSecondaryDamageType}}}`;
+        }
+
+        return '';
+    }
+
+    static getPrimaryOtherDamage(stats) {
+        if (stats.otherDice && stats.otherModifier) {
+            return `{{other_damage=[[${stats.otherDice}${stats.otherModifier}]]}}{{other_damage_crit=[[${stats.otherDice}]]}}`;
+        } else if (stats.otherDice) {
+            return `{{other_damage=[[${stats.otherDice}]]}}{{other_damage_crit=[[${stats.otherDice}]]}}`;
+        } else if (stats.otherModifier) {
+            return `{{other_damage=[[${stats.otherModifier}]]}}`;
+        }
+
+        return '';
+    }
+
+    static getPrimaryOtherDamageType(stats) {
+        if (stats.otherType) {
+            return `{{other_damage_type=${stats.otherType}}}`;
+        }
+
+        return '';
+    }
+
+    static getSecondaryOtherDamage(stats) {
+        if (stats.otherSecondaryDice && stats.otherSecondaryModifier) {
+            return `{{other_second_damage=[[${stats.otherSecondaryDice}${stats.otherSecondaryModifier}]]}}{{other_second_damage_crit=[[${stats.otherSecondaryDice}]]}}`;
+        } else if (stats.otherSecondaryDice) {
+            return `{{other_second_damage=[[${stats.otherSecondaryDice}]]}}{{other_second_damage_crit=[[${stats.otherSecondaryDice}]]}}`;
+        } else if (stats.otherSecondaryModifier) {
+            return `{{other_second_damage=[[${stats.otherSecondaryModifier}]]}}`;
+        }
+
+        return '';
+    }
+
+    static getSecondaryOtherDamageType(stats) {
+        if (stats.otherSecondaryType) {
+            return `{{other_second_damage_type=${stats.otherSecondaryType}}}`;
         }
 
         return '';

@@ -120,3 +120,15 @@
     width: 100%;
     background: transparent;
 }
+
+.dc20-hidden {
+    display: none !important;
+}
+
+.dc20-attack-title {
+    font-weight: bold;
+}
+
+.dc20-attack-description {
+    font-size: 14px;
+}

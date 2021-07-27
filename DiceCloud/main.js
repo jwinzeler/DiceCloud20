@@ -126,42 +126,22 @@ function getButtonConfig(info) {
             [Button.ADVANTAGE]: {
                 templateStats: {
                     advantage: advantageStates.ADVANTAGE,
-                    title: info.title,
-                    mainModifier: info.value,
-                    attackDice: info.dice,
-                    attackModifier: info.modifier,
-                    attackType: info.type
+                    ...info
                 },
-                create: !info.requiresSavingThrow && !info.isHeal,
+                create: !!info.mainModifier,
             },
             [Button.NORMAL]: {
                 templateStats: {
-                    title: info.title,
-                    mainModifier: !info.requiresSavingThrow && !info.isHeal ? info.value : null,
-                    attackDice: !info.requiresSavingThrow && !info.isHeal ? info.dice : null,
-                    attackModifier: !info.requiresSavingThrow && !info.isHeal ? info.modifier : null,
-                    attackType: !info.requiresSavingThrow && !info.isHeal ? info.type : null,
-                    saveDC: info.requiresSavingThrow ? info.value : null,
-                    saveAbility: info.requiresSavingThrow ? info.extra.toUpperCase() : null,
-                    saveFailure: info.requiresSavingThrow ? true : null,
-                    saveFailureDice: info.requiresSavingThrow ? info.dice : null,
-                    saveFailureModifier: info.requiresSavingThrow ? info.modifier : null,
-                    saveFailureDamageType: info.requiresSavingThrow ? info.type : null,
-                    healDice: info.isHeal ? info.dice : null,
-                    healModifier: info.isHeal ? info.modifier : null,
+                    ...info
                 },
                 create: true,
             },
             [Button.DISADVANTAGE]: {
                 templateStats: {
                     advantage: advantageStates.DISADVANTAGE,
-                    title: info.title,
-                    mainModifier: info.value,
-                    attackDice: info.dice,
-                    attackModifier: info.modifier,
-                    attackType: info.type
+                    ...info
                 },
-                create: !info.requiresSavingThrow && !info.isHeal,
+                create: !!info.mainModifier,
             },
         },
         [ElementType.FEATURE]: {
@@ -218,28 +198,51 @@ function getElementTypeInfo(elementType, element) {
             };
             return info;
         case ElementType.ATTACK:
-            info = {
-                title: element.querySelector('.paper-font-body2').innerHTML.trim(),
-                dice: element.querySelector('.flex.layout.vertical div:nth-child(2)').innerHTML.cleanWhiteSpace(),
-                value: element.querySelector('.paper-font-headline').innerHTML.cleanWhiteSpace(),
+            const elements = {
+                template: element.querySelector('.flex.layout.vertical div:nth-child(2)'),
+                extra: element.querySelector('.flex.layout.vertical div:nth-child(3)'),
             };
-            info.type = info.dice.match(/(&nbsp;[a-z]+)$/)[0].replace('&nbsp;', '').upperCaseFirst();
-            info.modifier = info.dice.replace(/(&nbsp;[a-z]+)$/, '').replace(' ', '').replace(/[0-9]+d[0-9]+/, '');
-            info.dice = info.dice.replace(/(&nbsp;[a-z]+)$/, '').replace(' ', '').replace(/\+[0-9]+$/, '');
 
-            let extra = element.querySelector('.flex.layout.vertical div:nth-child(3)');
-            if (extra) {
-                info.extra = extra.innerHTML.trim();
+            let title = '';
+            if (elements.extra) {
+                title = elements.extra.innerHTML.cleanWhiteSpace();
+            }
+            
+            let matches = [];
+            if (elements.template) {
+                matches = actionRegex.exec(elements.template.innerHTML.cleanWhiteSpace());
             } else {
-                info.extra = '';
+                matches = actionRegex.exec('');
             }
-            info.requiresSavingThrow = info.extra.includes('Saving Throw');
-            info.isHeal = info.extra.includes('Heal');
-            if (info.requiresSavingThrow) {
-                info.extra = info.extra.replace(' Saving Throw', '');
-                info.value = info.value.replace('+', '');
-            }
-            return info;
+
+            return {
+                title,
+                subheader: matches[37],
+                mainModifier: matches[2],
+                attackDice: matches[4],
+                attackModifier: matches[5],
+                attackType: matches[6],
+                attackSecondaryDice: matches[8],
+                attackSecondaryModifier: matches[9],
+                attackSecondaryType: matches[10],
+                saveDC: matches[12],
+                saveAbility: getLongformAbilityFromMatch(matches[13]),
+                saveSuccess: matches[23],
+                saveFailureDice: matches[15],
+                saveFailureModifier: matches[16],
+                saveFailureDamageType: matches[17],
+                saveFailureSecondaryDice: matches[19],
+                saveFailureSecondaryModifier: matches[20],
+                saveFailureSecondaryDamageType: matches[21],
+                healDice: matches[25],
+                healModifier: matches[26],
+                otherDice: matches[29],
+                otherModifier: matches[30],
+                otherType: matches[31],
+                otherSecondaryDice: matches[33],
+                otherSecondaryModifier: matches[34],
+                otherSecondaryType: matches[35],
+            };
         case ElementType.FEATURE:
             info = {
                 title: element.querySelector('.flex').innerHTML.trim(),
@@ -256,6 +259,20 @@ function getElementTypeInfo(elementType, element) {
                 info.uses = uses[1]
             }
             return info;
+    }
+}
+
+function getLongformAbilityFromMatch(match) {
+    if (match) {
+        const abilities = {
+            'str': 'Strength',
+            'dex': 'Dexterity',
+            'con': 'Constitution',
+            'int': 'Intelligence',
+            'wis': 'Wisdom',
+            'cha': 'Charisma'
+        };
+        return abilities[match] || match;
     }
 }
 
@@ -288,6 +305,104 @@ function getButton(templateStats, cclass, label) {
     return element;
 }
 
+function getActionDescription(config) {
+    const stats = config[Button.NORMAL].templateStats;
+    for (let [key, stat] of Object.entries(stats)) {
+        stats[key] = stat || '';
+    }
+    let desc = '';
+    if (stats.mainModifier) {
+        desc += `${stats.mainModifier}`;
+        if (stats.attackDice || stats.attackModifier) {
+            desc += `: ${stats.attackDice}${stats.attackModifier}`;
+        }
+        if (stats.attackType) {
+            desc += ` ${stats.attackType}`;
+        }
+        if (stats.attackSecondaryDice || stats.attackSecondaryModifier) {
+            desc += ` + ${stats.attackSecondaryDice}${stats.attackSecondaryModifier}`;
+
+            if (stats.attackSecondaryType) {
+                desc += ` ${stats.attackSecondaryType}`;
+            }
+        }
+        desc += `\n<br/>`;
+    }
+    
+    if (stats.saveDC) {
+        desc += `DC${stats.saveDC} ${stats.saveAbility}: ${stats.saveFailureDice}${stats.saveFailureModifier}`;
+        if (stats.saveFailureDamageType) {
+            desc += ` ${stats.saveFailureDamageType}`;
+        }
+        if (stats.saveFailureSecondaryDice || stats.saveFailureSecondaryModifier) {
+            desc += ` + ${stats.saveFailureSecondaryDice}${stats.saveFailureSecondaryModifier}`;
+
+            if (stats.saveFailureSecondaryDamageType) {
+                desc += ` ${stats.saveFailureSecondaryDamageType}`;
+            }
+        }
+        desc += `\n<br/>`;
+        if (stats.saveSuccess) {
+            desc += `Success: ${stats.saveSuccess}`;
+        }
+        desc += `\n<br/>`;
+    }
+
+    if (stats.otherDice || stats.otherModifier) {
+        desc += `${stats.otherDice}${stats.otherModifier}`;
+
+        if (stats.otherType) {
+            desc += ` ${stats.otherType}`;
+        }
+
+        if (stats.otherSecondaryDice || stats.otherSecondaryModifier) {
+            desc += ` + ${stats.otherSecondaryDice}${stats.otherSecondaryModifier}`;
+
+            if (stats.otherSecondaryType) {
+                desc += ` ${stats.otherSecondaryType}`;
+            }
+        }
+
+        desc += `\n<br/>`;
+    }
+
+    if (stats.healDice || stats.healModifier) {
+        desc += `Regain ${stats.healDice}${stats.healModifier}\n<br/>`;
+    }
+
+    return desc;
+}
+
+function addExtraAttackElements(element, config) {
+    const elements = {
+        parent: element.querySelector('.flex.layout.vertical'),
+        mod: element.querySelector('.paper-font-headline'),
+        title: element.querySelector('.flex.layout.vertical div:nth-child(1)'),
+        template: element.querySelector('.flex.layout.vertical div:nth-child(2)'),
+        extra: element.querySelector('.flex.layout.vertical div:nth-child(3)'),
+    };
+    
+    if (elements.title) {
+        elements.title.classList.add('dc20-hidden');
+    }
+    if (elements.mod) {
+        elements.mod.classList.add('dc20-hidden');
+    }
+    if (elements.template) {
+        elements.template.classList.add('dc20-hidden');
+    }
+    if (elements.extra) {
+        elements.extra.classList.add('dc20-attack-title');
+    }
+    if (elements.parent) {
+        const description = document.createElement('div');
+        description.classList.add('dc20');
+        description.classList.add('dc20-attack-description');
+        description.innerHTML = getActionDescription(config);
+        elements.parent.append(description);
+    }
+}
+
 function addButton(element, config, cclass, label) {
     if (config.create) {
         element.append(getButton(config.templateStats, cclass, label));
@@ -295,19 +410,24 @@ function addButton(element, config, cclass, label) {
 }
 
 function getRollerHTML(elementType, element) {
-    let info = getElementTypeInfo(elementType, element);
-    let buttonConfig = getButtonConfig(info);
+    const info = getElementTypeInfo(elementType, element);
+    const buttonConfig = getButtonConfig(info);
+    const config = buttonConfig[elementType];
 
     let newElement = document.createElement('div');
     newElement.classList.add('dc20');
-    buttonConfig[elementType].classes.forEach(c => {
+    config.classes.forEach(c => {
         newElement.classList.add(c);
     });
 
-    addButton(newElement, buttonConfig[elementType][Button.POST], 'dc20-post', '?');
-    addButton(newElement, buttonConfig[elementType][Button.ADVANTAGE], 'dc20-advantage', '˄');
-    addButton(newElement, buttonConfig[elementType][Button.NORMAL], 'dc20-normal', '-');
-    addButton(newElement, buttonConfig[elementType][Button.DISADVANTAGE], 'dc20-disadvantage', '˅');
+    if (elementType === ElementType.ATTACK) {
+        addExtraAttackElements(element, config);
+    }
+
+    addButton(newElement, config[Button.POST], 'dc20-post', '?');
+    addButton(newElement, config[Button.ADVANTAGE], 'dc20-advantage', '˄');
+    addButton(newElement, config[Button.NORMAL], 'dc20-normal', '-');
+    addButton(newElement, config[Button.DISADVANTAGE], 'dc20-disadvantage', '˅');
 
     return newElement;
 }
@@ -315,7 +435,7 @@ function getRollerHTML(elementType, element) {
 function removeOldHtml(element) {
     let oldHtml = element.querySelector(".dc20");
     if (oldHtml) {
-        element.removeChild(oldHtml);
+        oldHtml.remove();
     }
 }
 

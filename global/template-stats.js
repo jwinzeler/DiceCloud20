@@ -31,6 +31,14 @@ class TemplateStats {
     saveFailureSecondaryModifier; // string \+[0-9]+
     saveFailureSecondaryDamageType; // string any
 
+    otherDice; // string [0-9]+d[0-9]+
+    otherModifier; // string \+[0-9]+
+    otherType; // string any
+
+    otherSecondaryDice; // string [0-9]+d[0-9]+
+    otherSecondaryModifier; // string \+[0-9]+
+    otherSecondaryType; // string any
+
     healDice; // string [0-9]+d[0-9]+
     healModifier; // string \+[0-9]+
 }

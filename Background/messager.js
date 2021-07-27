@@ -24,7 +24,7 @@ class Messager {
                         console.log("Sending Message to Roll20", request, sendResponse);
                         chrome.tabs.sendMessage(this.roll20.tab.id, request);
                     } else {
-                        console.warn("Attempted to send Message to Roll20 but it hasn't been initated.", request, sendResponse);
+                        console.log("Attempted to send Message to Roll20 but it hasn't been initated.", request, sendResponse);
                         chrome.tabs.sendMessage(diceCloud.tab.id, "noRoll20");
                     }
                 } else if (sender.origin === "https://giffyglyph.com") {
@@ -32,7 +32,7 @@ class Messager {
                         console.log("Sending Message to Roll20", request, sendResponse);
                         chrome.tabs.sendMessage(this.roll20.tab.id, request);
                     } else {
-                        console.warn("Attempted to send Message to Giffyglyph but it hasn't been initated.", request, sendResponse);
+                        console.log("Attempted to send Message to Giffyglyph but it hasn't been initated.", request, sendResponse);
                         chrome.tabs.sendMessage(this.monsterMaker.tab.id, "noRoll20");
                     }
                 } else if (sender.origin === "https://app.roll20.net") {
@@ -40,7 +40,7 @@ class Messager {
                         console.log("Sending Message to DiceCloud", request, sendResponse);
                         chrome.tabs.sendMessage(this.dicecloud.tab.id, request);
                     } else {
-                        console.warn("Attempted to send Message to DiceCloud but it hasn't been initated.", request, sendResponse);
+                        console.log("Attempted to send Message to DiceCloud but it hasn't been initated.", request, sendResponse);
                     }
                 }
             }
