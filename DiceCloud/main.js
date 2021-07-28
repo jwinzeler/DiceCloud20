@@ -226,7 +226,7 @@ function getElementTypeInfo(elementType, element) {
                 attackSecondaryModifier: matches[9],
                 attackSecondaryType: matches[10],
                 saveDC: matches[12],
-                saveAbility: getLongformAbilityFromMatch(matches[13]),
+                saveAbility: AbilityConverter.convertShortToLong(matches[13]),
                 saveSuccess: matches[23],
                 saveFailureDice: matches[15],
                 saveFailureModifier: matches[16],
@@ -262,36 +262,6 @@ function getElementTypeInfo(elementType, element) {
     }
 }
 
-function getLongformAbilityFromMatch(match) {
-    if (match) {
-        const abilities = {
-            'str': 'Strength',
-            'dex': 'Dexterity',
-            'con': 'Constitution',
-            'int': 'Intelligence',
-            'wis': 'Wisdom',
-            'cha': 'Charisma'
-        };
-        return abilities[match] || match;
-    }
-}
-
-String.prototype.formatText = function() {
-    let string = this.trim();
-    string = string.replace(/<\/?strong>/g, '**').replace(/<p>/g, '\n').replace(/<\/p>/g, '');
-    return string;
-}
-
-String.prototype.cleanWhiteSpace = function() {
-    let string = this.trim();
-    string = string.replace(/\s{2,}/g, '').replace(/\*/g, '');
-    return string;
-}
-
-String.prototype.upperCaseFirst = function() {
-    return this.charAt(0).toUpperCase() + this.slice(1)
-}
-
 function sendRoll(templateStats) {
     const message = TemplateStringBuilder.getTemplate(templateStats);
     chrome.runtime.sendMessage(message);
@@ -307,70 +277,7 @@ function getButton(templateStats, cclass, label) {
 
 function getActionDescription(config) {
     const stats = config[Button.NORMAL].templateStats;
-    for (let [key, stat] of Object.entries(stats)) {
-        stats[key] = stat || '';
-    }
-    let desc = '';
-    if (stats.mainModifier) {
-        desc += `${stats.mainModifier}`;
-        if (stats.attackDice || stats.attackModifier) {
-            desc += `: ${stats.attackDice}${stats.attackModifier}`;
-        }
-        if (stats.attackType) {
-            desc += ` ${stats.attackType}`;
-        }
-        if (stats.attackSecondaryDice || stats.attackSecondaryModifier) {
-            desc += ` + ${stats.attackSecondaryDice}${stats.attackSecondaryModifier}`;
-
-            if (stats.attackSecondaryType) {
-                desc += ` ${stats.attackSecondaryType}`;
-            }
-        }
-        desc += `\n<br/>`;
-    }
-    
-    if (stats.saveDC) {
-        desc += `DC${stats.saveDC} ${stats.saveAbility}: ${stats.saveFailureDice}${stats.saveFailureModifier}`;
-        if (stats.saveFailureDamageType) {
-            desc += ` ${stats.saveFailureDamageType}`;
-        }
-        if (stats.saveFailureSecondaryDice || stats.saveFailureSecondaryModifier) {
-            desc += ` + ${stats.saveFailureSecondaryDice}${stats.saveFailureSecondaryModifier}`;
-
-            if (stats.saveFailureSecondaryDamageType) {
-                desc += ` ${stats.saveFailureSecondaryDamageType}`;
-            }
-        }
-        desc += `\n<br/>`;
-        if (stats.saveSuccess) {
-            desc += `Success: ${stats.saveSuccess}`;
-        }
-        desc += `\n<br/>`;
-    }
-
-    if (stats.otherDice || stats.otherModifier) {
-        desc += `${stats.otherDice}${stats.otherModifier}`;
-
-        if (stats.otherType) {
-            desc += ` ${stats.otherType}`;
-        }
-
-        if (stats.otherSecondaryDice || stats.otherSecondaryModifier) {
-            desc += ` + ${stats.otherSecondaryDice}${stats.otherSecondaryModifier}`;
-
-            if (stats.otherSecondaryType) {
-                desc += ` ${stats.otherSecondaryType}`;
-            }
-        }
-
-        desc += `\n<br/>`;
-    }
-
-    if (stats.healDice || stats.healModifier) {
-        desc += `Regain ${stats.healDice}${stats.healModifier}\n<br/>`;
-    }
-
-    return desc;
+    return ActionDescriptionBuilder.getDescriptionTable(stats);
 }
 
 function addExtraAttackElements(element, config) {
@@ -392,13 +299,10 @@ function addExtraAttackElements(element, config) {
         elements.template.classList.add('dc20-hidden');
     }
     if (elements.extra) {
-        elements.extra.classList.add('dc20-attack-title');
+        elements.extra.classList.add('dc20-action-title');
     }
     if (elements.parent) {
-        const description = document.createElement('div');
-        description.classList.add('dc20');
-        description.classList.add('dc20-attack-description');
-        description.innerHTML = getActionDescription(config);
+        description = getActionDescription(config);
         elements.parent.append(description);
     }
 }

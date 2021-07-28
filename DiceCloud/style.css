@@ -73,7 +73,7 @@
 .dc20-attack {
     position: absolute;
     right: 5px;
-    top: 0;
+    top: -5px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -96,6 +96,60 @@
     border: 0;
 }
 
+.dc20-hidden {
+    display: none !important;
+}
+
+.dc20-action-title {
+    font-weight: bold;
+}
+
+.dc20-action-description {
+    overflow-y: auto;
+    width: calc(100% - 12px);
+}
+
+.dc20-action-description::-webkit-scrollbar {
+    width: 10px;
+}
+ 
+.dc20-action-description::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background-color: #e4e4e4;
+}
+ 
+.dc20-action-description::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background-color: #c0c0c0;
+}
+
+.dc20-action-table {
+    border-spacing: 0;
+    border: 0;
+    width: calc(100% - 3px);
+}
+
+.dc20-action-table th,
+.dc20-action-table td {
+    text-align: left;
+    margin: 0;
+    padding: 3px 0;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(0,0,0,.06);
+}
+
+.dc20-action-table tr:last-child th,
+.dc20-action-table tr:last-child td {
+    border-bottom: 0;
+}
+
+.dc20-action-table th {
+    width: 30%;
+    font-weight: normal;
+}
+
+
+/* Overwrites */
 .features .column-container>div:first-child {
     column-span: all;
 }
@@ -121,14 +175,11 @@
     background: transparent;
 }
 
-.dc20-hidden {
-    display: none !important;
+.features .item-slot .attack .layout.horizontal {
+    height: 64px;
 }
 
-.dc20-attack-title {
-    font-weight: bold;
-}
-
-.dc20-attack-description {
-    font-size: 14px;
+.features .item-slot .attack .layout.vertical {
+    margin-top: -3px;
+    margin-bottom: 3px;
 }
