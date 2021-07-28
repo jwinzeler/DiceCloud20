@@ -2,7 +2,7 @@ class ActionDescriptionBuilder {
     static defaultConfig = {
         showSaveSuccess: true,
         showSaveFailureText: true,
-        showSaveFailureTextIfDamage: true,
+        hideSaveFailureTextIfDamage: false,
         otherDamageLabel: 'Other',
     }
 
@@ -103,7 +103,7 @@ class ActionDescriptionBuilder {
 
         if (config.showSaveFailureText) {
             if (stats.saveFailure) {
-                if ((stats.showSaveFailureTextIfDamage && description.length > 0) || description.length === 0) {
+                if (!(config.hideSaveFailureTextIfDamage && description.length > 0)) {
                     if (description.length > 0) {
                         description += '<br/>';
                     }
@@ -138,9 +138,9 @@ class ActionDescriptionBuilder {
     }
 
 
-    static getOtherRowHeader(stats) {
+    static getOtherRowHeader(stats, config) {
         if (stats.otherDice || stats.otherModifier || stats.otherSecondaryDice || stats.otherSecondaryModifier) {
-            return 'Other'
+            return config.otherDamageLabel;
         }
 
         return '';

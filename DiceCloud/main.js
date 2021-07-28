@@ -280,7 +280,7 @@ function getActionDescription(config) {
     const stats = config[Button.NORMAL].templateStats;
     return ActionDescriptionBuilder.getDescriptionTable(stats, {
         showSaveSuccess: false,
-        showSaveFailureTextIfDamage: false,
+        hideSaveFailureTextIfDamage: true,
         otherDamageLabel: 'Deal',
     });
 }
