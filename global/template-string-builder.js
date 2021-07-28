@@ -21,6 +21,7 @@ class TemplateStringBuilder {
         template += TemplateStringBuilder.getSaveAbility(stats);
         template += TemplateStringBuilder.getSaveSuccess(stats);
         template += TemplateStringBuilder.getHasSaveFailureDamage(stats);
+        template += TemplateStringBuilder.getNonDamageSaveFailure(stats);
 
         template += TemplateStringBuilder.getPrimarySaveFailure(stats);
         template += TemplateStringBuilder.getPrimarySaveFailureType(stats);
@@ -181,6 +182,14 @@ class TemplateStringBuilder {
     static getHasSaveFailureDamage(stats) {
         if (stats.saveFailureDice) {
             return '{{has_saving_throw_damage=1}}{{saving_throw_damage_macro=Saving throw failure:}}';
+        }
+
+        return '';
+    }
+
+    static getNonDamageSaveFailure(stats) {
+        if (stats.saveFailure) {
+            return `{{content=*Saving throw failure:*\n ${stats.saveFailure}}}`;
         }
 
         return '';

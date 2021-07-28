@@ -52,6 +52,7 @@ const attackRegex = new RegExp(`\\[${modifierRegex.source}(:${damageRegex.source
 
 /**
  * Matches an entire save roll, for example:
+ * [saveDCRegex:damageRegex:damageRegex?Anything to be displayed on save success!Anything to be displayed on save failure]
  * [saveDCRegex:damageRegex:damageRegex?Anything to be displayed on save success]
  * [saveDCRegex:damageRegex:damageRegex]
  * [saveDCRegex:damageRegex?Anything to be displayed on save success]
@@ -68,8 +69,10 @@ const attackRegex = new RegExp(`\\[${modifierRegex.source}(:${damageRegex.source
  * 8, 9, 10: damageRegex groups for second damage
  * 11: save success string
  * 12: save success
+ * 13: save failure string
+ * 14: save failure
  */
-const saveRegex = new RegExp(`\\[${saveDCRegex.source}(:${damageRegex.source})?(:${damageRegex.source})?(\\?([^\\]]+))?\\]`);
+const saveRegex = new RegExp(`\\[${saveDCRegex.source}(:${damageRegex.source})?(:${damageRegex.source})?(\\?([^\\]!]+))?(\\!([^\\]]+))?\\]`);
 
 /**
  * Matches an entire heal roll, for example:
@@ -113,12 +116,12 @@ const subheaderRegex = /\[([^\]]+)\]/;
  * 1: attackRegex string
  * 2, 3, 4, 5, 6, 7, 8, 9, 10: attackRegex groups
  * 11: saveRegex string
- * 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23: saveRegex groups
- * 24: healRegex string
- * 25, 26: healRegex groups
- * 27: fixedRegex string
- * 28, 29, 30, 31, 32, 33, 34, 35: fixedRegex groups
- * 36: subheaderRegex string
- * 37: subheaderRegex group
+ * 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25: saveRegex groups
+ * 26: healRegex string
+ * 27, 28: healRegex groups
+ * 29: fixedRegex string
+ * 30, 31, 32, 33, 34, 35, 36, 37: fixedRegex groups
+ * 38: subheaderRegex string
+ * 39: subheaderRegex group
  */
 const actionRegex = new RegExp(`(${attackRegex.source})?(${saveRegex.source})?(${healRegex.source})?(${fixedRegex.source})?(${subheaderRegex.source})?`);

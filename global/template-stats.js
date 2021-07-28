@@ -22,6 +22,7 @@ class TemplateStats {
     saveDC; // number
     saveAbility; // string strength, dexterity, constitution, intelligence, wisdom, charisma
     saveSuccess; // string any
+    saveFailure; // string any
 
     saveFailureDice; // string [0-9]+d[0-9]+
     saveFailureModifier; // string \+[0-9]+

@@ -1,30 +1,44 @@
 class ActionDescriptionBuilder {
-    static getDescriptionTable(stats) {
+    static defaultConfig = {
+        showSaveSuccess: true,
+        showSaveFailureText: true,
+        showSaveFailureTextIfDamage: true,
+        otherDamageLabel: 'Other',
+    }
+
+    static getDescriptionTable(stats, config = {}) {
+        config = {...ActionDescriptionBuilder.defaultConfig, ...config};
         stats = ActionDescriptionBuilder.cleanStats(stats);
 
-        const attack = ActionDescriptionBuilder.getRowElement(stats, 'attack', {
+        const attack = ActionDescriptionBuilder.getRowElement(stats, config, 'attack', {
             th: ActionDescriptionBuilder.getAttackRowHeader,
             td: ActionDescriptionBuilder.getAttackRowDescription,
         });
 
-        const save = ActionDescriptionBuilder.getRowElement(stats, 'save', {
-            th: ActionDescriptionBuilder.getSaveRowHeader,
-            td: ActionDescriptionBuilder.getSaveRowDescription,
+        const saveFailure = ActionDescriptionBuilder.getRowElement(stats, config, 'save-success', {
+            th: ActionDescriptionBuilder.getSaveFailureRowHeader,
+            td: ActionDescriptionBuilder.getSaveFailureRowDescription,
         });
 
-        const other = ActionDescriptionBuilder.getRowElement(stats, 'other', {
+        const saveSuccess = ActionDescriptionBuilder.getRowElement(stats, config, 'save-failure', {
+            th: ActionDescriptionBuilder.getSaveSuccessRowHeader,
+            td: ActionDescriptionBuilder.getSaveSuccessRowDescription,
+        });
+
+        const other = ActionDescriptionBuilder.getRowElement(stats, config, 'other', {
             th: ActionDescriptionBuilder.getOtherRowHeader,
             td: ActionDescriptionBuilder.getOtherRowDescription,
         });
 
-        const heal = ActionDescriptionBuilder.getRowElement(stats, 'heal', {
+        const heal = ActionDescriptionBuilder.getRowElement(stats, config, 'heal', {
             th: ActionDescriptionBuilder.getHealRowHeader,
             td: ActionDescriptionBuilder.getHealRowDescription,
         });
 
         return ActionDescriptionBuilder.getTableElement([
             attack,
-            save,
+            saveFailure,
+            saveSuccess,
             other,
             heal
         ]);
@@ -59,7 +73,7 @@ class ActionDescriptionBuilder {
         return description;
     }
 
-    static getSaveRowHeader(stats) {
+    static getSaveFailureRowHeader(stats) {
         if (stats.saveDC && stats.saveAbility) {
             return `DC${stats.saveDC} ${AbilityConverter.convertLongToShort(stats.saveAbility)}`;
         }
@@ -68,8 +82,9 @@ class ActionDescriptionBuilder {
     }
 
 
-    static getSaveRowDescription(stats) {
+    static getSaveFailureRowDescription(stats, config) {
         let description = '';
+
         if (stats.saveFailureDice || stats.saveFailureModifier) {
             description += `${stats.saveFailureDice}${stats.saveFailureModifier}`
 
@@ -86,13 +101,46 @@ class ActionDescriptionBuilder {
             }
         }
 
+        if (config.showSaveFailureText) {
+            if (stats.saveFailure) {
+                if ((stats.showSaveFailureTextIfDamage && description.length > 0) || description.length === 0) {
+                    if (description.length > 0) {
+                        description += '<br/>';
+                    }
+        
+                    description += `${stats.saveFailure}`;
+                }
+            }
+        }
+
         return description;
+    }
+
+    static getSaveSuccessRowHeader(stats, config) {
+        if (config.showSaveSuccess) {
+            if (stats.saveSuccess) {            
+                return `Success`;
+            }
+        }
+
+        return '';
+    }
+
+
+    static getSaveSuccessRowDescription(stats, config) {
+        if (config.showSaveSuccess) {
+            if (stats.saveSuccess) {            
+                return `${stats.saveSuccess}`;
+            }
+        }
+
+        return '';
     }
 
 
     static getOtherRowHeader(stats) {
         if (stats.otherDice || stats.otherModifier || stats.otherSecondaryDice || stats.otherSecondaryModifier) {
-            return 'Deal'
+            return 'Other'
         }
 
         return '';
@@ -146,12 +194,12 @@ class ActionDescriptionBuilder {
         return stats;
     }
 
-    static getRowElement(stats, rowName, textSources) {
+    static getRowElement(stats, config, rowName, textSources) {
         const th = document.createElement('th');
-        th.innerHTML = textSources.th(stats);
+        th.innerHTML = textSources.th(stats, config);
 
         const td = document.createElement('td');
-        td.innerHTML = textSources.td(stats);
+        td.innerHTML = textSources.td(stats, config);
 
         if (th.innerHTML.length > 0 || td.innerHTML.length > 0) {
             const row = document.createElement('tr');

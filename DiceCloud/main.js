@@ -217,7 +217,7 @@ function getElementTypeInfo(elementType, element) {
 
             return {
                 title,
-                subheader: matches[37],
+                subheader: matches[39],
                 mainModifier: matches[2],
                 attackDice: matches[4],
                 attackModifier: matches[5],
@@ -228,20 +228,21 @@ function getElementTypeInfo(elementType, element) {
                 saveDC: matches[12],
                 saveAbility: AbilityConverter.convertShortToLong(matches[13]),
                 saveSuccess: matches[23],
+                saveFailure: matches[25],
                 saveFailureDice: matches[15],
                 saveFailureModifier: matches[16],
                 saveFailureDamageType: matches[17],
                 saveFailureSecondaryDice: matches[19],
                 saveFailureSecondaryModifier: matches[20],
                 saveFailureSecondaryDamageType: matches[21],
-                healDice: matches[25],
-                healModifier: matches[26],
-                otherDice: matches[29],
-                otherModifier: matches[30],
-                otherType: matches[31],
-                otherSecondaryDice: matches[33],
-                otherSecondaryModifier: matches[34],
-                otherSecondaryType: matches[35],
+                healDice: matches[27],
+                healModifier: matches[28],
+                otherDice: matches[31],
+                otherModifier: matches[32],
+                otherType: matches[33],
+                otherSecondaryDice: matches[35],
+                otherSecondaryModifier: matches[36],
+                otherSecondaryType: matches[37],
             };
         case ElementType.FEATURE:
             info = {
@@ -277,7 +278,11 @@ function getButton(templateStats, cclass, label) {
 
 function getActionDescription(config) {
     const stats = config[Button.NORMAL].templateStats;
-    return ActionDescriptionBuilder.getDescriptionTable(stats);
+    return ActionDescriptionBuilder.getDescriptionTable(stats, {
+        showSaveSuccess: false,
+        showSaveFailureTextIfDamage: false,
+        otherDamageLabel: 'Deal',
+    });
 }
 
 function addExtraAttackElements(element, config) {

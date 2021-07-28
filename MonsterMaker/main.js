@@ -157,157 +157,79 @@ function createButtons(elementType, key, element) {
         const child = document.createElement('button');
 
         let title = source.querySelector('.name').innerHTML.trim().replace('.', '');
-        let subheader = source.querySelector('.detail').innerHTML.trim().replace('<i>', '').replace('</i>', '').replace('<b>', '').replace('</b>', '');
+        let statsSource = source.querySelector('.detail').innerHTML.trim().replace('−', '-');
 
-        const attackModRegexp = /([+-−][0-9]+) to hit/;
-        const attackDiceRegexp = /[hH]it: [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) [a-zA-Z]+ damage/;
-        const attackDamageRegexp = /[hH]it: [0-9]+ \([0-9]+d[0-9]+ (\+ [0-9]+)\) [a-zA-Z]+ damage/; // Replace whitespace with nothing!
-        const attackDamageTypeRegexp = /[hH]it: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) ([a-zA-Z]+) damage/;
-
-        const attack2DiceRegexp = /[hH]it: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) [a-zA-Z]+ damage and [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) [a-zA-Z]+ damage/;
-        const attack2DamageRegexp = /[hH]it: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) [a-zA-Z]+ damage and [0-9]+ \([0-9]+d[0-9]+ (\+ [0-9]+)\) [a-zA-Z]+ damage/; // Replace whitespace with nothing!
-        const attack2DamageTypeRegexp = /[hH]it: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) [a-zA-Z]+ damage and [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) ([a-zA-Z]+) damage/;
-
-        const saveDCRegexp = /DC ([0-9]+) [a-zA-Z]+ saving throw/;
-        const saveAbilityRegexp = /DC [0-9]+ ([a-zA-Z]+) saving throw/;
-
-        const saveSuccessRegexp = /[sS]uccess: ([^\.]+)\./;
-
-        const saveFailureRegexp = /[fF]ailure: ([^\.]+)\./;
-        const saveFailureDiceRegexp = /[fF]ailure: [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) [a-zA-Z]+ damage/;
-        const saveFailureDamageRegexp = /[fF]ailure: [0-9]+ \([0-9]+d[0-9]+ (\+ [0-9]+)\) [a-zA-Z]+ damage/; // Replace whitespace with nothing!
-        const saveFailureDamageTypeRegexp = /[fF]ailure: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) ([a-zA-Z]+) damage/;
-        
-        const saveFailure2DiceRegexp = /[fF]ailure: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) [a-zA-Z]+ damage and [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) [a-zA-Z]+ damage/;
-        const saveFailure2DamageRegexp = /[fF]ailure: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) [a-zA-Z]+ damage and [0-9]+ \([0-9]+d[0-9]+ (\+ [0-9]+)\) [a-zA-Z]+ damage/; // Replace whitespace with nothing!
-        const saveFailure2DamageTypeRegexp = /[fF]ailure: [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) [a-zA-Z]+ damage and [0-9]+ \([0-9]+d[0-9]+( \+ [0-9]+)?\) ([a-zA-Z]+) damage/;
-
-        const healDiceRegexp = /[rR]egain [0-9]+ \(([0-9]+d[0-9]+)( \+ [0-9]+)?\) hitpoints/;
-        const healDamageRegexp = /[rR]egain [0-9]+ \([0-9]+d[0-9]+ (\+ [0-9]+)\) hitpoints/; // Replace whitespace with nothing!
-
-        let mainModifier = subheader.match(attackModRegexp);
-        if (mainModifier) {
-            mainModifier = mainModifier[1].replace('−', '-');
-        }
-        let attackDice = subheader.match(attackDiceRegexp);
-        if (attackDice) {
-            attackDice = attackDice[1];
-        }
-        let attackModifier = subheader.match(attackDamageRegexp);
-        if (attackModifier) {
-            attackModifier = attackModifier[1].replace(' ', '');
-        }
-        let attackType = subheader.match(attackDamageTypeRegexp);
-        if (attackType) {
-            attackType = attackType[2];
-        }
-
-        let attackSecondaryDice = subheader.match(attack2DiceRegexp);
-        if (attackSecondaryDice) {
-            attackSecondaryDice = attackSecondaryDice[2];
-        }
-        let attackSecondaryModifier = subheader.match(attack2DamageRegexp);
-        if (attackSecondaryModifier) {
-            attackSecondaryModifier = attackSecondaryModifier[2].replace(' ', '');
-        }
-        let attackSecondaryType = subheader.match(attack2DamageTypeRegexp);
-        if (attackSecondaryType) {
-            attackSecondaryType = attackSecondaryType[3];
-        }
-
-        let saveDC = subheader.match(saveDCRegexp);
-        if (saveDC) {
-            saveDC = saveDC[1];
-        }
-        let saveAbility = subheader.match(saveAbilityRegexp);
-        if (saveAbility) {
-            saveAbility = saveAbility[1];
-        }
-
-        let saveSuccess = subheader.match(saveSuccessRegexp);
-        if (saveSuccess) {
-            saveSuccess = saveSuccess[1];
-        }
-
-        let saveFailure = subheader.match(saveFailureRegexp);
-        if (saveFailure) {
-            saveFailure = saveFailure[1];
-        }
-        let saveFailureDice = subheader.match(saveFailureDiceRegexp);
-        if (saveFailureDice) {
-            saveFailureDice = saveFailureDice[1];
-        }
-        let saveFailureModifier = subheader.match(saveFailureDamageRegexp);
-        if (saveFailureModifier) {
-            saveFailureModifier = saveFailureModifier[1].replace(' ', '');
-        }
-        let saveFailureDamageType = subheader.match(saveFailureDamageTypeRegexp);
-        if (saveFailureDamageType) {
-            saveFailureDamageType = saveFailureDamageType[2];
-        }
-        
-        let saveFailureSecondaryDice = subheader.match(saveFailure2DiceRegexp);
-        if (saveFailureSecondaryDice) {
-            saveFailureSecondaryDice = saveFailureSecondaryDice[2];
-        }
-        let saveFailureSecondaryModifier = subheader.match(saveFailure2DamageRegexp);
-        if (saveFailureSecondaryModifier) {
-            saveFailureSecondaryModifier = saveFailureSecondaryModifier[2].replace(' ', '');
-        }
-        let saveFailureSecondaryDamageType = subheader.match(saveFailure2DamageTypeRegexp);
-        if (saveFailureSecondaryDamageType) {
-            saveFailureSecondaryDamageType = saveFailureSecondaryDamageType[3];
-        }
-
-        let healDice = subheader.match(healDiceRegexp);
-        if (healDice) {
-            healDice = healDice[1];
-        }
-        let healModifier = subheader.match(healDamageRegexp);
-        if (healModifier) {
-            healModifier = healModifier[1].replace(' ', '');
-        }
-
-        subheader = subheader
-            .replace(attackModRegexp, '')
-            .replace(attack2DiceRegexp, '')
-            .replace(attackDiceRegexp, '')
-            .replace(saveDCRegexp, '')
+        const subheader = statsSource
+            .replace(mainModifierRegexp, '')
+            .replace(attackRegexp, '')
+            .replace(saveRegexp, '')
             .replace(saveSuccessRegexp, '')
             .replace(saveFailureRegexp, '')
-            .replace(healDiceRegexp, '')
-            .replace(/<[^>]*>/g, '')
-            .replaceAll('&nbsp;.', '')
-            .replaceAll(' .', '')
+            .replace(saveFailureExtraRegexp, '')
+            .replace(otherRegexp, '')
+            .replace(healRegexp, '')
             .trim();
-        if (subheader === '.') {
-            subheader = undefined;
+        
+        const titleElement = document.createElement('div');
+        titleElement.classList.add('dc20-action-title');
+        titleElement.innerHTML = title;
+        child.append(titleElement);
+        
+        if (subheader) {
+            const subHeaderElement = document.createElement('div');
+            subHeaderElement.classList.add('dc20-action-subheader');
+            subHeaderElement.innerHTML = subheader;
+            child.append(subHeaderElement);
         }
 
-        child.onclick = function() { sendRoll({
+        const mainModifierMatches = statsSource.match(mainModifierRegexp);
+        const attackMatches = statsSource.match(attackRegexp);
+        const saveMatches = statsSource.match(saveRegexp);
+        const saveSuccessMatches = statsSource.match(saveSuccessRegexp);
+        const saveFailureMatches = statsSource.match(saveFailureRegexp);
+        const saveFailureExtraMatches = statsSource.match(saveFailureExtraRegexp);
+        const otherMatches = statsSource.match(otherRegexp);
+        const healMatches = statsSource.match(healRegexp);
+
+        const stats = {
             title,
-            subheader,
-            mainModifier,
-            attackDice,
-            attackModifier,
-            attackType,
-            attackSecondaryDice,
-            attackSecondaryModifier,
-            attackSecondaryType,
-            saveDC,
-            saveAbility,
-            saveSuccess,
-            saveFailureDice,
-            saveFailureModifier,
-            saveFailureDamageType,
-            saveFailureSecondaryDice,
-            saveFailureSecondaryModifier,
-            saveFailureSecondaryDamageType,
-            healDice,
-            healModifier
-        }); }
-        
-        child.append(source.cloneNode(true));
+            subheader: subheader
+                .replace(/<\/?i>/g, '*').replace(/<\/?b>/g, '**')
+                .replace(/<[^/>]*>/g, '\n')
+                .replace(/<\/[^>]*>/g, '')
+                .replace(/&nbsp;/g, '')
+                .trim(),
+            mainModifier: mainModifierMatches ? mainModifierMatches[1] : undefined,
+            attackDice: attackMatches ? attackMatches[1] : undefined,
+            attackModifier: attackMatches ? attackMatches[2] : undefined,
+            attackType: attackMatches ? attackMatches[3] : undefined,
+            attackSecondaryDice: attackMatches ? attackMatches[5] : undefined,
+            attackSecondaryModifier: attackMatches ? attackMatches[6] : undefined,
+            attackSecondaryType: attackMatches ? attackMatches[7] : undefined,
+            saveDC: saveMatches ? saveMatches[1] : undefined,
+            saveAbility: saveMatches ? saveMatches[2] : undefined,
+            saveSuccess: saveSuccessMatches ? saveSuccessMatches[1] : undefined,
+            saveFailure: saveFailureExtraMatches ? saveFailureExtraMatches[1] : undefined,
+            saveFailureDice: saveFailureMatches ? saveFailureMatches[1] : undefined,
+            saveFailureModifier: saveFailureMatches ? saveFailureMatches[2] : undefined,
+            saveFailureDamageType: saveFailureMatches ? saveFailureMatches[3] : undefined,
+            saveFailureSecondaryDice: saveFailureMatches ? saveFailureMatches[5] : undefined,
+            saveFailureSecondaryModifier: saveFailureMatches ? saveFailureMatches[6] : undefined,
+            saveFailureSecondaryDamageType: saveFailureMatches ? saveFailureMatches[7] : undefined,
+            otherDice: otherMatches ? otherMatches[1] : undefined,
+            otherModifier: otherMatches ? otherMatches[2] : undefined,
+            otherType: otherMatches ? otherMatches[3] : undefined,
+            otherSecondaryDice: otherMatches ? otherMatches[5] : undefined,
+            otherSecondaryModifier: otherMatches ? otherMatches[6] : undefined,
+            otherSecondaryType: otherMatches ? otherMatches[7] : undefined,
+            healDice: healMatches ? healMatches[1] : undefined,
+            healModifier: healMatches ? healMatches[2] : undefined
+        };
+
+        child.onclick = function() { sendRoll(stats); }
+        const descriptionElement = ActionDescriptionBuilder.getDescriptionTable(stats);
+        child.append(descriptionElement);
+
         source.classList.add('dc20-hidden');
         newElement.append(child);
         element.append(newElement);
@@ -351,7 +273,10 @@ function addActionLegend() {
         'Saving Throw': ['DC 17 Strength saving throw.&nbsp;', '[dc-primary] Strength saving throw.&nbsp;'],
         'Save Failure': ['Failure: 30 (5d10 + 3) fire damage.&nbsp;', 'Failure: [damage, d10] fire damage.&nbsp;'],
         'Save Failure Multiple Damage Types': ['Failure: 30 (5d10 + 3) fire damage and 14 (5d4 + 2) thunder damage.&nbsp;', 'Failure: [damage, d10] fire damage and [14, d4] thunder damage.&nbsp;'],
+        'Save Failure Extra Text': ['Failure Text: Any text goes here, no rolls though.&nbsp;'],
         'Save Success': ['Success: Any text goes here, no rolls though :(.&nbsp;'],
+        'Other': ['Other: 30 (5d10 + 3) fire damage.&nbsp;', 'Other: [damage, d10] fire damage.&nbsp;'],
+        'Other Multiple Damage Types': ['Other: 30 (5d10 + 3) fire damage and 14 (5d4 + 2) thunder damage.&nbsp;', 'Other: [damage, d10] fire damage and [14, d4] thunder damage.&nbsp;'],
         'Heal': ['Regain 30 (2d20 + 9) hitpoints.&nbsp;', 'Regain [damage, d20] hitpoints.&nbsp;'],
     }
 

@@ -104,3 +104,43 @@
     display: block;
     margin: 2px;
 }
+
+.monster-action button,
+.monster-reaction button {
+    width: 100%;
+    padding: 0;
+}
+
+.dc20-action-title {
+    font-weight: bold;
+    padding: 5px 5px 0;
+}
+
+.dc20-action-subheader {
+    padding: 5px 5px 0;
+}
+
+.dc20-action-description {
+    margin-top: 5px;
+}
+
+.dc20-action-table {
+    width: 100%;
+}
+
+.dc20-action-table td,
+.dc20-action-table th {
+    padding: 3px 8px;
+    font-size: 12px;
+}
+
+.dc20-action-table td {
+    border-top: 1px solid rgba(0,0,0,.12);
+}
+
+.dc20-action-table th {
+    width: 25%;
+    font-weight: normal;
+    border-right: 1px solid rgba(0,0,0,.12);
+    border-top: 1px solid rgba(0,0,0,.12);
+}

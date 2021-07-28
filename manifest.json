@@ -1,6 +1,6 @@
 {
     "name": "DiceCloud20",
-    "version": "2.3",
+    "version": "3.0",
     "description": "Simple integration between DiceCloud character sheets and the roll20 chat",
     "manifest_version": 2,
     "background": {
@@ -33,6 +33,10 @@
             "matches": ["https://giffyglyph.com/monstermaker/app/*"],
             "css": ["monstermaker/style.css"],
             "js": [
+                "global/string.extension.js",
+                "global/ability-converter.js",
+                "global/action-description-builder.js",
+                "global/monstermaker-template-language.regexp.js",
                 "global/template-string-builder.js",
                 "global/advantage-states.js",
                 "monstermaker/main.js"
