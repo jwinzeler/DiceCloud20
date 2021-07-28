@@ -44,22 +44,8 @@ function sendRoll(info) {
     chrome.runtime.sendMessage(message);
 }
 
-function formatAbility(abilities) {
-    if (abilities.replace) {
-        return abilities
-            .replace('Str', 'Strength')
-            .replace('Dex', 'Dexterity')
-            .replace('Con', 'Constitution')
-            .replace('Int', 'Intelligence')
-            .replace('Wis', 'Wisdom')
-            .replace('Cha', 'Charisma')
-            .replaceAll('/', ' / ');
-    }
-    return abilities;
-}
-
 function formatTitle(key, string) {
-    string = formatAbility(string);
+    string = AbilityConverter.convertShortToLong(string);
     switch (key) {
         case 'SAVE':
             return string += ' Saving Throw';
@@ -128,16 +114,20 @@ function createButtons(elementType, key, element) {
         const source = element.querySelector(elementType.childSelector);
         strings = source.innerHTML.trim().split(', ');
         strings.forEach(s => {
-            let title = formatTitle(key, s.trim().match(/[a-zA-Z\/]+/)[0]);
             let modifier = s.trim().match(/[+-−][0-9]+/)[0].replace('−', '-');
-            const child = document.createElement('button');
-            child.onclick = function() { sendRoll({
-                title,
-                mainModifier: modifier,
-                isInitiative: title === 'Initiative' ? true : undefined,
-            }); }
-            child.innerHTML = s;
-            newElement.append(child);
+            const titles = s.split('/');
+            titles.forEach(t => {
+                let label = t.trim().match(/[a-zA-Z\/]+/)[0];
+                let title = formatTitle(key, label);
+                const child = document.createElement('button');
+                child.onclick = function() { sendRoll({
+                    title,
+                    mainModifier: modifier,
+                    isInitiative: title === 'Initiative' ? true : undefined,
+                }); }
+                child.innerHTML = `${label} ${modifier}`;
+                newElement.append(child);
+            });
         });
         source.classList.add('dc20-hidden');
         element.append(newElement);

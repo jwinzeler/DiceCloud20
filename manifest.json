@@ -1,6 +1,6 @@
 {
     "name": "DiceCloud20",
-    "version": "3.0",
+    "version": "3.1",
     "description": "Simple integration between DiceCloud character sheets and the roll20 chat",
     "manifest_version": 2,
     "background": {
