@@ -146,8 +146,17 @@ function createButtons(elementType, key, element) {
         const source = element.querySelector(elementType.childSelector);
         const child = document.createElement('button');
 
-        let title = source.querySelector('.name').innerHTML.trim().replace('.', '');
-        let statsSource = source.querySelector('.detail').innerHTML.trim().replace('−', '-');
+        const titleSourceElement = source.querySelector('.name');
+        let title = '';
+        if (titleSourceElement) {
+            title = titleSourceElement.innerHTML.trim().replace('.', '');
+        }
+
+        const detailSourceElement = source.querySelector('.detail');
+        let statsSource = '';
+        if (detailSourceElement) {
+            statsSource = detailSourceElement.innerHTML.trim().replace('−', '-');
+        }
 
         const subheader = statsSource
             .replace(mainModifierRegexp, '')
