@@ -32,6 +32,16 @@ const ElementType = {
         parent: ".monster-reaction",
         childSelector: "p",
         selector: "dc20-reaction",
+    },
+    LEGENDARY: {
+        parent: ".monster-legendary-action",
+        childSelector: "p",
+        selector: "dc20-legendary-action",
+    },
+    LAIR: {
+        parent: ".monster-lair-action",
+        childSelector: "p",
+        selector: "dc20-lair-action",
     }
 }
 
@@ -142,7 +152,7 @@ function createButtons(elementType, key, element) {
         source.classList.add('dc20-hidden');
         newElement.append(child);
         element.append(newElement);
-    } else if (["ACTION", "REACTION"].includes(key)) {
+    } else if (["ACTION", "REACTION", "LEGENDARY", "LAIR"].includes(key)) {
         const source = element.querySelector(elementType.childSelector);
         const child = document.createElement('button');
 
@@ -259,12 +269,6 @@ function updateElements() {
 }
 
 function addActionLegend() {
-    const actions = document.querySelector('.repeatable-section[data-path=actions] #blueprint-action');
-    const old = actions.querySelector('.dc20-legend');
-    if (old) {
-        actions.removeChild(old);
-    }
-
     const actionList = {
         'Attack': ['+9 to hit.&nbsp;', '[attack] to hit.&nbsp;'],
         'Attack Damage': ['Hit: 33 (1d10 + 5) slashing damage.&nbsp;', 'Hit: [damage, d10] slashing damage.&nbsp;'],
@@ -308,7 +312,19 @@ function addActionLegend() {
         legend.append(formGroup);
     }
 
-    actions.append(legend);
+    for (const [id, path] of Object.entries({
+        "action": "actions",
+        "reaction": "reactions",
+        "legendary-action": "legendaryActions",
+        "lair-action": "lairActions"
+    })) {
+        const actions = document.querySelector(`.repeatable-section[data-path=${path}] #blueprint-${id}`);
+        const old = actions.querySelector('.dc20-legend');
+        if (old) {
+            actions.removeChild(old);
+        }
+        actions.append(legend.cloneNode(true));
+    }
 }
 
 function updateMenu() {
