@@ -1,4 +1,5 @@
 let rollState = advantageStates.NORMAL;
+let isAutoSaving;
 let gmRoll = false;
 let menu;
 
@@ -334,6 +335,7 @@ function updateMenu() {
     } else {
         body.classList.remove('dc20-gmroll');
     }
+
     switch(rollState) {
         case advantageStates.NORMAL:
             body.classList.remove('dc20-disadvantage');
@@ -347,6 +349,12 @@ function updateMenu() {
             body.classList.remove('dc20-disadvantage');
             body.classList.add('dc20-advantage');
             break;
+    }
+
+    if (isAutoSaving) {
+        body.classList.add('dc20-autosaving');
+    } else {
+        body.classList.remove('dc20-autosaving');
     }
 }
 
@@ -384,6 +392,37 @@ function toggleDisadvantage() {
     }
 }
 
+function toggleAutosave() {
+    if (isAutoSaving) {
+        clearInterval(isAutoSaving);
+        isAutoSaving = undefined;
+    } else {
+        autoSave();
+        isAutoSaving = setInterval(() => {
+            autoSave();
+        }, 15000);
+    }
+    updateMenu();
+}
+
+function autoSave() {
+    const updatedModal = document.querySelector('#modal-updated');
+    if (updatedModal) {
+        updatedModal.remove();
+    }
+
+    const saveButton = document.querySelector('.btn-save');
+    if (saveButton) {
+        saveButton.click();
+        updateElements();
+
+        document.body.classList.add('dc20-saved');
+        setTimeout(() => {
+            document.body.classList.remove('dc20-saved');
+        }, 200);
+    }
+}
+
 function getMenuElements() {
     menu = document.createElement('div');
     menu.classList.add('dc20-menu');
@@ -406,6 +445,13 @@ function getMenuElements() {
     disadvantage.classList.add('dc20-disadvantage');
     disadvantage.classList.add('dc20-noadvantage');
     disadvantage.onclick = function() { toggleDisadvantage(); }
+
+    const autosave = document.createElement('button');
+    autosave.innerHTML = '🖫';
+    autosave.classList.add('dc20-autosave');
+    autosave.classList.add('dc20-noadvantage');
+    autosave.onclick = function() { toggleAutosave(); }
+    toggleAutosave();
     
     const refresh = document.createElement('button');
     refresh.innerHTML = '&#x21bb;';
@@ -416,6 +462,7 @@ function getMenuElements() {
     menu.append(gmroll);
     menu.append(advantage);
     menu.append(disadvantage);
+    menu.append(autosave);
     menu.append(refresh);
     return menu;
 }
