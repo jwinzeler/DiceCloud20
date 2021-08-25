@@ -365,6 +365,7 @@ function setRollState(state) {
 
 function toggleGMRoll() {
     gmRoll = !gmRoll;
+    gmRoll ? createNotification('GM roll on', '#283f57', '#fff') : createNotification('GM roll off', '#283f57', '#fff');
     updateMenu();
 }
 
@@ -373,9 +374,11 @@ function toggleAdvantage() {
         case advantageStates.NORMAL:
         case advantageStates.DISADVANTAGE:
             setRollState(advantageStates.ADVANTAGE);
+            createNotification('Advantage on', '#648f64', '#fff');
             break;
         case advantageStates.ADVANTAGE:
             setRollState(advantageStates.NORMAL);
+            createNotification('Advantage off', '#648f64', '#fff');
             break;
     }
 }
@@ -385,24 +388,51 @@ function toggleDisadvantage() {
         case advantageStates.NORMAL:
         case advantageStates.ADVANTAGE:
             setRollState(advantageStates.DISADVANTAGE);
+            createNotification('Disadvantage on', '#9c6565', '#fff');
             break;
         case advantageStates.DISADVANTAGE:
             setRollState(advantageStates.NORMAL);
+            createNotification('Disadvantage off', '#9c6565', '#fff');
             break;
     }
 }
 
+function refreshButtons() {
+    createNotification('Buttons refreshed');
+    updateElements();
+}
+
 function toggleAutosave() {
     if (isAutoSaving) {
+        createNotification('Autosave off', '#b8559f', '#fff');
         clearInterval(isAutoSaving);
         isAutoSaving = undefined;
     } else {
+        createNotification('Autosave on', '#b8559f', '#fff');
         autoSave();
         isAutoSaving = setInterval(() => {
             autoSave();
         }, 15000);
     }
     updateMenu();
+}
+
+function createNotification(message, backgroundColor = '#efefef', fontColor = '#333') {
+    let notificationContainer = document.querySelector('.dc20-notifications');
+    if (!notificationContainer) {
+        notificationContainer = document.createElement('div');
+        notificationContainer.classList.add('dc20-notifications');
+        document.body.append(notificationContainer);
+    }
+
+    const notification = document.createElement('div');
+    notification.innerHTML = message;
+    notification.style.backgroundColor = backgroundColor;
+    notification.style.color = fontColor;
+    notificationContainer.append(notification);
+    setTimeout(() => {
+        notification.remove();
+    }, 2000);
 }
 
 function autoSave() {
@@ -414,12 +444,8 @@ function autoSave() {
     const saveButton = document.querySelector('.btn-save');
     if (saveButton) {
         saveButton.click();
+        createNotification('Saved', '#2e9762', '#fff');
         updateElements();
-
-        document.body.classList.add('dc20-saved');
-        setTimeout(() => {
-            document.body.classList.remove('dc20-saved');
-        }, 200);
     }
 }
 
@@ -457,7 +483,7 @@ function getMenuElements() {
     refresh.innerHTML = '&#x21bb;';
     refresh.classList.add('dc20-refresh');
     refresh.classList.add('dc20-noadvantage');
-    refresh.onclick = function() { updateElements(); }
+    refresh.onclick = function() { refreshButtons(); }
     
     menu.append(gmroll);
     menu.append(advantage);
